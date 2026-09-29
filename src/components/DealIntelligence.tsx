@@ -194,9 +194,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   const [chatLoading, setChatLoading] = useState(false);
 
   // Load All Deal Data
-  const loadData = async () => {
+  const loadData = async (isInitial: boolean = false) => {
     try {
-      setLoading(true);
+      if (isInitial || !deal) setLoading(true);
       const details = await fetchDealDetails(dealId);
       setDeal(details.deal);
       setCustomer(details.customer);
@@ -219,7 +219,7 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, [dealId]);
 
   // Live Call Timer Effect
