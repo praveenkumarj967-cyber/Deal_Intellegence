@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import pg from 'pg';
-import { supabase } from './supabaseClient.js';
+import { getSupabaseClient } from './supabaseClient.js';
 import {
   Deal,
   Customer,
@@ -111,9 +111,10 @@ class DBStore {
 
   // DEALS
   public async getDeals(): Promise<Deal[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('deals').select('*').order('updated_at', { ascending: false });
+        const { data, error } = await sb.from('deals').select('*').order('updated_at', { ascending: false });
         if (!error && data && data.length > 0) return data as Deal[];
       } catch (e) {
         console.warn('Supabase query error for getDeals, using store:', (e as Error).message);
@@ -132,9 +133,10 @@ class DBStore {
   }
 
   public async getDealById(id: string): Promise<Deal | null> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('deals').select('*').eq('id', id).single();
+        const { data, error } = await sb.from('deals').select('*').eq('id', id).single();
         if (!error && data) return data as Deal;
       } catch (e) {}
     }
@@ -166,9 +168,15 @@ class DBStore {
       updated_at: new Date().toISOString(),
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('deals').insert([newDeal]);
+        const { data, error } = await sb.from('deals').insert([newDeal]).select();
+        if (error) {
+          console.error('⚠️ Supabase insert deal error:', error.message, error.details);
+        } else {
+          console.log('✅ Deal inserted into Supabase successfully:', newDeal.id);
+        }
       } catch (e) {
         console.warn('Supabase insert deal error:', (e as Error).message);
       }
@@ -189,9 +197,10 @@ class DBStore {
       updated_at: new Date().toISOString(),
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('deals').update(updated).eq('id', id);
+        await sb.from('deals').update(updated).eq('id', id);
       } catch (e) {}
     }
 

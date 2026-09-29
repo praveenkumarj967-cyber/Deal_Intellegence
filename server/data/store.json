@@ -1,6 +1,38 @@
 {
   "deals": [
     {
+      "id": "deal-1790689141697",
+      "name": "Enterprise Automation Project",
+      "company": "Stark Industries",
+      "value": 180000,
+      "stage": "Proposal",
+      "probability": 60,
+      "expected_close_date": "2026-10-29",
+      "account_owner": "Alex Morgan",
+      "deal_health": "Good",
+      "risk_level": "Low",
+      "last_interaction": "Deal Created",
+      "next_action": "Conduct initial discovery call",
+      "created_at": "2026-09-29T13:39:01.697Z",
+      "updated_at": "2026-09-29T13:39:01.697Z"
+    },
+    {
+      "id": "deal-1790688749805",
+      "name": "Enterprice",
+      "company": "PhonePay",
+      "value": 100000,
+      "stage": "Discovery",
+      "probability": 35,
+      "expected_close_date": "2026-10-29",
+      "account_owner": "Alex Morgan",
+      "deal_health": "Good",
+      "risk_level": "Medium",
+      "last_interaction": "Created New Deal",
+      "next_action": "Conduct discovery call and gather requirements",
+      "created_at": "2026-09-29T13:32:29.805Z",
+      "updated_at": "2026-09-29T13:32:29.805Z"
+    },
+    {
       "id": "deal-acme-101",
       "name": "Acme Corp Workflow Automation",
       "company": "Acme Corporation",
@@ -156,6 +188,27 @@
       "company_name": "Apex Financial",
       "industry": "Enterprise Technology",
       "budget": "$1,50,000",
+      "timeline": "Q4 2026",
+      "current_solution": "Legacy solution",
+      "pain_points": [
+        "Manual processes",
+        "Limited reporting visibility"
+      ],
+      "company_requirements": [
+        "Modern automated platform",
+        "Rapid deployment"
+      ],
+      "priorities": [
+        "Efficiency improvement",
+        "Cost effectiveness"
+      ]
+    },
+    "deal-1790688749805": {
+      "id": "cust-deal-1790688749805",
+      "deal_id": "deal-1790688749805",
+      "company_name": "PhonePay",
+      "industry": "Enterprise Technology",
+      "budget": "$1,00,000",
       "timeline": "Q4 2026",
       "current_solution": "Legacy solution",
       "pain_points": [
