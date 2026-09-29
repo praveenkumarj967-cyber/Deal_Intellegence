@@ -10,11 +10,11 @@
       "expected_close_date": "2026-10-29",
       "account_owner": "Alex Morgan",
       "deal_health": "Good",
-      "risk_level": "Medium",
-      "last_interaction": "Created New Deal",
-      "next_action": "Conduct discovery call and gather requirements",
+      "risk_level": "High",
+      "last_interaction": "2026-09-29 - Meeting: 30-Day Implementation Planning Call",
+      "next_action": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
       "created_at": "2026-09-29T13:40:51.911Z",
-      "updated_at": "2026-09-29T13:40:51.911Z"
+      "updated_at": "2026-09-29T13:53:29.399Z"
     },
     {
       "id": "deal-1790689141697",
@@ -239,6 +239,28 @@
         "Efficiency improvement",
         "Cost effectiveness"
       ]
+    },
+    "deal-1790689251911": {
+      "id": "cust-deal-1790689251911",
+      "deal_id": "deal-1790689251911",
+      "company_name": "PhonePay",
+      "industry": "Enterprise Technology",
+      "budget": "$1,00,000",
+      "timeline": "Q4 2026",
+      "current_solution": "Legacy solution",
+      "pain_points": [
+        "Manual processes",
+        "Limited reporting visibility"
+      ],
+      "company_requirements": [
+        "Modern automated platform",
+        "Rapid deployment",
+        "Customer requires a guaranteed 30-day implementation plan prior to final contract execution"
+      ],
+      "priorities": [
+        "Efficiency improvement",
+        "Cost effectiveness"
+      ]
     }
   },
   "stakeholders": {
@@ -272,6 +294,18 @@
         "email": "dvance@acmecorp.com",
         "sentiment": "Neutral",
         "notes": "Reviewing pricing structure and pushing for competitive discounts against Salesforce."
+      }
+    ],
+    "deal-1790689251911": [
+      {
+        "id": "sh-1790690009194-s56u",
+        "deal_id": "deal-1790689251911",
+        "name": "Sarah Johnson",
+        "title": "VP of Operations",
+        "role": "Decision Maker",
+        "email": "",
+        "sentiment": "Concerned",
+        "notes": "Iterated requirement for strict 30-day rollout roadmap."
       }
     ]
   },
@@ -344,6 +378,36 @@
         ],
         "date": "2026-09-28",
         "created_at": "2026-09-28T16:30:00Z"
+      }
+    ],
+    "deal-1790689251911": [
+      {
+        "id": "int-1790690008826",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "30-Day Implementation Planning Call",
+        "content": "Full Live Meeting Transcript:\nAlex Morgan (AE): \"Hi Sarah, hi Mike! Thanks for jumping on today to review our 30-day implementation roadmap.\"\nSarah Johnson (VP Ops): \"Thanks Alex. As I mentioned earlier, our biggest priority is ensuring full deployment happens within 30 days so reporting turnarounds do not slip.\"\nMike Chen (Engineering): \"From an API standpoint, your integration docs look clean. We just need confirmation on dedicated technical support during week 1 setup.\"\nAlex Morgan (AE): \"Absolutely. We will assign a dedicated Lead Implementation Engineer for your account throughout the 30-day rollout.\"\nDavid Vance (Procurement): \"Architecture review passed SOC2 compliance.\"",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson",
+          "Mike Chen"
+        ],
+        "date": "2026-09-29",
+        "created_at": "2026-09-29T13:53:28.826Z"
+      },
+      {
+        "id": "int-1790689874533",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Scheduled: 30-Day Implementation Planning Call",
+        "content": "Meeting scheduled for 2026-10-02 at 14:00. Agenda: Review 30-day implementation roadmap and transparent onboarding cost breakdown.",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "date": "2026-10-02",
+        "created_at": "2026-09-29T13:51:14.533Z"
       }
     ]
   },
@@ -421,6 +485,32 @@
         "resolved": false,
         "created_at": "2026-09-28T16:35:00Z"
       }
+    ],
+    "deal-1790689251911": [
+      {
+        "id": "mem-1790690009106-cfle",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690008826",
+        "memory_type": "Objection",
+        "content": "Customer is concerned about deployment delays impacting operational workflow turnaround",
+        "importance": "High",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T13:53:29.106Z"
+      },
+      {
+        "id": "mem-1790690009106-81bv",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690008826",
+        "memory_type": "Requirement",
+        "content": "Customer requires a guaranteed 30-day implementation plan prior to final contract execution",
+        "importance": "Critical",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T13:53:29.106Z"
+      }
     ]
   },
   "competitors": {
@@ -448,6 +538,18 @@
       "risk_mitigation": "Provide a written 30-day implementation guarantee with assigned technical onboarding owner prior to next call.",
       "status": "Active",
       "created_at": "2026-09-28T17:00:00Z"
+    },
+    "deal-1790689251911": {
+      "id": "rec-deal-1790689251911",
+      "deal_id": "deal-1790689251911",
+      "recommendation": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+      "reason": "Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
+      "confidence": 92,
+      "risk_level": "High",
+      "risk_reason": "Implementation objection is the single remaining friction point blocking contract signature.",
+      "risk_mitigation": "Deliver a 30-day implementation milestone proposal with dedicated technical onboarding support.",
+      "status": "Active",
+      "created_at": "2026-09-29T13:53:29.298Z"
     }
   },
   "meetings": {
@@ -468,6 +570,25 @@
         "meeting_link": "https://meet.google.com/nexus-acme-plan",
         "status": "Scheduled",
         "created_at": "2026-09-29T10:00:00Z"
+      }
+    ],
+    "deal-1790689251911": [
+      {
+        "id": "mtg-1790689874365",
+        "deal_id": "deal-1790689251911",
+        "title": "30-Day Implementation Planning Call",
+        "date": "2026-10-02",
+        "time": "14:00",
+        "duration": "30 min",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "agenda": "Review 30-day implementation roadmap and transparent onboarding cost breakdown.",
+        "meeting_link": "https://meet.google.com/new",
+        "status": "Scheduled",
+        "created_at": "2026-09-29T13:51:14.365Z"
       }
     ]
   },

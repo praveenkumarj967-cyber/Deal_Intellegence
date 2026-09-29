@@ -301,7 +301,7 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
       setSchedulingMeeting(true);
       const attendeesList = meetingAttendees.split(',').map((a) => a.trim());
 
-      await scheduleMeeting(dealId, {
+      const createdMtg = await scheduleMeeting(dealId, {
         title: meetingTitle,
         date: meetingDate,
         time: meetingTime,
@@ -313,6 +313,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
 
       setIsScheduleMeetingOpen(false);
       await loadData();
+
+      // Automatically launch Live Virtual Meeting Room with NexusAI Agent attending!
+      handleJoinLiveMeeting(createdMtg);
     } catch (err) {
       console.error('Failed to schedule meeting:', err);
     } finally {
