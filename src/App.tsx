@@ -38,18 +38,14 @@ export function App() {
   const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Auth State
+  // Auth State (Requires initial login / account creation if not authenticated)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
     const saved = localStorage.getItem('NEXUS_AUTH_USER');
-    return saved ? JSON.parse(saved) : {
-      id: 'usr-default',
-      name: 'Alex Morgan',
-      email: 'alex.morgan@nexus.ai',
-      role: 'Enterprise AE',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    };
+    return saved ? JSON.parse(saved) : null;
   });
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(() => {
+    return !localStorage.getItem('NEXUS_AUTH_USER');
+  });
   const [summary, setSummary] = useState<DashboardSummary>({
     totalActive: 5,
     requiringAttention: 2,
