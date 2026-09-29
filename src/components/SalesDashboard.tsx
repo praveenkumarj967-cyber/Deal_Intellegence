@@ -213,42 +213,6 @@ export const SalesDashboard: React.FC<SalesDashboardProps> = ({
           </div>
         </div>
 
-        {/* Hackathon Demo Acme Corp Highlight Card */}
-        <div 
-          onClick={() => onSelectDeal('deal-acme-101')}
-          className="p-5 rounded-2xl bg-gradient-to-br from-blue-900/40 via-indigo-950/40 to-slate-900 border-2 border-blue-500/50 hover:border-blue-400 shadow-glow cursor-pointer transition-all flex flex-col justify-between group"
-        >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-blue-500 text-white shadow-sm">
-                PRIMARY DEMO SCENARIO
-              </span>
-              <span className="text-xs text-blue-300 font-semibold flex items-center group-hover:translate-x-1 transition-transform">
-                Open Intelligence <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </span>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-bold text-white group-hover:text-blue-200 transition-colors">
-                Acme Corporation
-              </h3>
-              <p className="text-xs text-slate-300 font-medium mt-0.5">
-                Value: <span className="text-emerald-400 font-bold">$120,000</span> | Stage: Negotiation (70%)
-              </p>
-            </div>
-
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Customer raised objections regarding 30-day implementation timeframe and onboarding cost vs Salesforce.
-            </p>
-          </div>
-
-          <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-            <span className="text-amber-400 font-semibold flex items-center">
-              <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Medium Risk
-            </span>
-            <span className="text-slate-400">5 Memories Stored</span>
-          </div>
-        </div>
       </div>
 
       {/* Filter and Search Bar */}

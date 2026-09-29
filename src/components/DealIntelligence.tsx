@@ -1650,19 +1650,8 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1">
                   <label className="block font-semibold text-slate-300">Conversation / Notes Transcript</label>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setInteractionContent(
-                        "Sarah said they are interested in moving forward, but implementation time is still the biggest concern. She wants a detailed 30-day implementation plan."
-                      )
-                    }
-                    className="text-[10px] text-blue-400 hover:underline font-semibold"
-                  >
-                    + Insert Hackathon Demo Input
-                  </button>
                 </div>
                 <textarea
                   rows={4}

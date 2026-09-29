@@ -71,16 +71,6 @@ export const Header: React.FC<HeaderProps> = ({
           <Wifi className="w-3 h-3 text-emerald-400 animate-pulse ml-0.5" />
         </div>
 
-        {/* Demo Reset Button */}
-        <button
-          onClick={onResetDemo}
-          title="Reset initial deal dataset for demo walkthrough"
-          className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800/80 hover:bg-slate-700 hover:text-white rounded-xl border border-slate-700 transition-colors"
-        >
-          <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
-          <span className="hidden sm:inline">Reset Demo</span>
-        </button>
-
         {/* User Account / Auth Section */}
         {currentUser ? (
           <div className="flex items-center space-x-3 pl-2 border-l border-slate-800">
