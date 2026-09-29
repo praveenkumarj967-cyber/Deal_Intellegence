@@ -1,5 +1,16 @@
 -- Supabase SQL Schema for Deal Intelligence Agent
--- Copy and paste this directly into Supabase SQL Editor!
+-- Copy and paste this directly into Supabase SQL Editor (https://supabase.com/dashboard/project/_/sql)!
+
+CREATE TABLE IF NOT EXISTS user_credentials (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT NOT NULL,
+  role TEXT DEFAULT 'Enterprise AE',
+  avatar TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_login TIMESTAMPTZ DEFAULT NOW()
+);
 
 CREATE TABLE IF NOT EXISTS profiles (
   id TEXT PRIMARY KEY,
@@ -115,7 +126,12 @@ CREATE TABLE IF NOT EXISTS scheduled_meetings (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS Policies on all tables
+-- Enable RLS Policies on all tables for public access
+ALTER TABLE user_credentials ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read User Credentials" ON user_credentials FOR SELECT USING (true);
+CREATE POLICY "Public Insert User Credentials" ON user_credentials FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update User Credentials" ON user_credentials FOR UPDATE USING (true);
+
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Profiles" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Public Insert Profiles" ON profiles FOR INSERT WITH CHECK (true);
@@ -158,3 +174,11 @@ ALTER TABLE scheduled_meetings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Meetings" ON scheduled_meetings FOR SELECT USING (true);
 CREATE POLICY "Public Insert Meetings" ON scheduled_meetings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Delete Meetings" ON scheduled_meetings FOR DELETE USING (true);
+
+-- Insert Default Demo Users into user_credentials
+INSERT INTO user_credentials (id, email, password, name, role)
+VALUES 
+  ('user-demo-ae', 'alex.morgan@nexus.ai', 'password123', 'Alex Morgan', 'Enterprise AE'),
+  ('user-demo-manager', 'sarah.jenkins@nexus.ai', 'password123', 'Sarah Jenkins', 'Sales Manager'),
+  ('user-demo-admin', 'admin@nexus.ai', 'admin123', 'RevOps Admin', 'RevOps Admin')
+ON CONFLICT (email) DO NOTHING;

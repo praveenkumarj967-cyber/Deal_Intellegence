@@ -14,6 +14,7 @@ import {
   KeyRound,
   CheckCircle,
   ShieldAlert,
+  Database,
 } from 'lucide-react';
 import { supabaseFrontend } from '../services/supabase';
 
@@ -45,7 +46,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
 
   if (!isOpen) return null;
 
-  // Password strength logic
   const getPasswordStrength = (pwd: string) => {
     if (!pwd) return { score: 0, label: '', color: 'bg-slate-700' };
     let score = 0;
@@ -62,6 +62,42 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
   };
 
   const strength = getPasswordStrength(password);
+
+  const saveUserCredentialsToSupabase = async (
+    id: string,
+    userName: string,
+    userEmail: string,
+    userPassword: string,
+    userRole: 'Enterprise AE' | 'Sales Manager' | 'RevOps Admin'
+  ) => {
+    if (!supabaseFrontend) return;
+    try {
+      // 1. Save into user_credentials table
+      await supabaseFrontend.from('user_credentials').upsert([
+        {
+          id,
+          email: userEmail,
+          password: userPassword,
+          name: userName,
+          role: userRole,
+          last_login: new Date().toISOString(),
+        },
+      ]);
+      console.log('✅ Credentials saved in Supabase user_credentials table!');
+
+      // 2. Save into profiles table
+      await supabaseFrontend.from('profiles').upsert([
+        {
+          id,
+          email: userEmail,
+          name: userName,
+          role: userRole,
+        },
+      ]);
+    } catch (e) {
+      console.warn('Supabase credentials insert notice:', (e as Error).message);
+    }
+  };
 
   const createSecureSession = async (
     id: string,
@@ -85,24 +121,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
     };
 
     localStorage.setItem('NEXUS_AUTH_USER', JSON.stringify(userObj));
-
-    // Save profile record into Supabase profiles table
-    if (supabaseFrontend) {
-      try {
-        await supabaseFrontend.from('profiles').upsert([
-          {
-            id: userObj.id,
-            email: userObj.email,
-            name: userObj.name,
-            role: userObj.role,
-          },
-        ]);
-        console.log('✅ User credentials and profile stored in Supabase profiles table!');
-      } catch (e) {
-        console.warn('Supabase profile save notice:', e);
-      }
-    }
-
     return userObj;
   };
 
@@ -119,18 +137,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
 
     try {
       if (supabaseFrontend) {
+        // Query user_credentials table in Supabase
+        try {
+          const { data: cred } = await supabaseFrontend
+            .from('user_credentials')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (isLogin && cred) {
+            if (cred.password !== password) {
+              setErrorMessage('Invalid password for registered Supabase account.');
+              setLoading(false);
+              return;
+            }
+            const userObj = await createSecureSession(cred.id, cred.name, cred.email, cred.role || role);
+            onAuthSuccess(userObj);
+            onClose();
+            return;
+          }
+        } catch (dbErr) {}
+
+        // Supabase Auth Integration
         if (isLogin) {
           const { data, error } = await supabaseFrontend.auth.signInWithPassword({ email, password });
-          if (error) {
-            throw new Error(`Supabase Auth Error: ${error.message}`);
-          }
-          if (data?.user) {
+          if (!error && data?.user) {
             const userObj = await createSecureSession(
               data.user.id,
               data.user.user_metadata?.name || email.split('@')[0],
               data.user.email || email,
               (data.user.user_metadata?.role as any) || role
             );
+            await saveUserCredentialsToSupabase(userObj.id, userObj.name, userObj.email, password, userObj.role);
             onAuthSuccess(userObj);
             onClose();
             return;
@@ -141,11 +179,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
             password,
             options: { data: { name, role } },
           });
-          if (error) {
-            throw new Error(`Supabase Auth Error: ${error.message}`);
-          }
-          if (data?.user) {
+          if (!error && data?.user) {
             const userObj = await createSecureSession(data.user.id, name || email.split('@')[0], data.user.email || email, role);
+            await saveUserCredentialsToSupabase(userObj.id, userObj.name, userObj.email, password, userObj.role);
             onAuthSuccess(userObj);
             onClose();
             return;
@@ -153,13 +189,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
         }
       }
 
-      // Offline / Local Authentication Mode
-      const userObj = await createSecureSession(
-        `user-${Date.now()}`,
-        isLogin ? (email ? email.split('@')[0] : 'Alex Morgan') : name || 'Alex Morgan',
-        email || 'alex.morgan@nexus.ai',
-        role
-      );
+      // Local / Offline Authentication Mode
+      const userId = `user-${Date.now()}`;
+      const userName = isLogin ? (email ? email.split('@')[0] : 'Alex Morgan') : name || 'Alex Morgan';
+      const userObj = await createSecureSession(userId, userName, email || 'alex.morgan@nexus.ai', role);
+      await saveUserCredentialsToSupabase(userObj.id, userObj.name, userObj.email, password, userObj.role);
+
       onAuthSuccess(userObj);
       onClose();
     } catch (err) {
@@ -169,11 +204,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
     }
   };
 
-  // Quick Demo Account Authentication Shortcut
   const handleQuickDemoLogin = async (demoRole: 'Enterprise AE' | 'Sales Manager' | 'RevOps Admin', demoEmail: string, demoName: string) => {
     setLoading(true);
     try {
-      const userObj = await createSecureSession(`user-demo-${demoRole.toLowerCase().replace(/\s+/g, '')}`, demoName, demoEmail, demoRole);
+      const demoId = `user-demo-${demoRole.toLowerCase().replace(/\s+/g, '')}`;
+      const userObj = await createSecureSession(demoId, demoName, demoEmail, demoRole);
+      await saveUserCredentialsToSupabase(demoId, demoName, demoEmail, 'password123', demoRole);
       onAuthSuccess(userObj);
       onClose();
     } finally {
@@ -200,7 +236,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           <p className="text-xs text-slate-400 max-w-xs">
             {isLogin
               ? 'Authentication required before accessing workspace memory & deal pipeline'
-              : 'Set up 256-bit encrypted sales team account with Supabase'}
+              : 'Credentials stored directly in Supabase user_credentials database'}
           </p>
         </div>
 
@@ -307,7 +343,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
             className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center space-x-2 transform active:scale-95"
           >
             {loading ? (
-              <span>Authenticating Session...</span>
+              <span>Syncing Supabase Credentials...</span>
             ) : isLogin ? (
               <>
                 <LogIn className="w-4 h-4" />
@@ -316,7 +352,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
             ) : (
               <>
                 <UserPlus className="w-4 h-4" />
-                <span>Create Workspace & Store Credentials</span>
+                <span>Save Credentials to Supabase</span>
               </>
             )}
           </button>
@@ -363,8 +399,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
         </div>
 
         <div className="flex items-center justify-center space-x-2 text-[10px] text-slate-500 pt-1 border-t border-slate-800/50">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>256-bit AES Encryption • Supabase JWT Auth Standard</span>
+          <Database className="w-3.5 h-3.5 text-blue-400" />
+          <span>Synced with Supabase user_credentials Table</span>
         </div>
       </div>
     </div>
