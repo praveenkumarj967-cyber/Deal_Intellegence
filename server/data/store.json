@@ -11,10 +11,10 @@
       "account_owner": "Alex Morgan",
       "deal_health": "Good",
       "risk_level": "High",
-      "last_interaction": "2026-09-29 - Meeting: 30-Day Implementation Planning Call",
+      "last_interaction": "2026-09-29 - Meeting: Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
       "next_action": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
       "created_at": "2026-09-29T13:40:51.911Z",
-      "updated_at": "2026-09-29T13:53:29.399Z"
+      "updated_at": "2026-09-29T14:01:01.760Z"
     },
     {
       "id": "deal-1790689141697",
@@ -260,7 +260,8 @@
       "priorities": [
         "Efficiency improvement",
         "Cost effectiveness"
-      ]
+      ],
+      "created_at": "2026-09-29T13:53:33.014368+00:00"
     }
   },
   "stakeholders": {
@@ -299,6 +300,26 @@
     "deal-1790689251911": [
       {
         "id": "sh-1790690009194-s56u",
+        "deal_id": "deal-1790689251911",
+        "name": "Sarah Johnson",
+        "title": "VP of Operations",
+        "role": "Decision Maker",
+        "email": "",
+        "sentiment": "Concerned",
+        "notes": "Iterated requirement for strict 30-day rollout roadmap."
+      },
+      {
+        "id": "sh-1790690338293-3ck2",
+        "deal_id": "deal-1790689251911",
+        "name": "Sarah Johnson",
+        "title": "VP of Operations",
+        "role": "Decision Maker",
+        "email": "",
+        "sentiment": "Concerned",
+        "notes": "Iterated requirement for strict 30-day rollout roadmap."
+      },
+      {
+        "id": "sh-1790690461611-kq64",
         "deal_id": "deal-1790689251911",
         "name": "Sarah Johnson",
         "title": "VP of Operations",
@@ -381,6 +402,62 @@
       }
     ],
     "deal-1790689251911": [
+      {
+        "id": "int-1790690461263",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "content": "Full Live Meeting Transcript:\nAlex Morgan (AE): \"Hi Sarah, hi Mike! Thanks for jumping on today to review our 30-day implementation roadmap.\"\nSarah Johnson (VP Ops): \"Thanks Alex. As I mentioned earlier, our biggest priority is ensuring full deployment happens within 30 days so reporting turnarounds do not slip.\"\nMike Chen (Engineering): \"From an API standpoint, your integration docs look clean. We just need confirmation on dedicated technical support during week 1 setup.\"\nAlex Morgan (AE): \"Absolutely. We will assign a dedicated Lead Implementation Engineer for your account throughout the 30-day rollout.\"",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson",
+          "Mike Chen"
+        ],
+        "date": "2026-09-29",
+        "created_at": "2026-09-29T14:01:01.263Z"
+      },
+      {
+        "id": "int-1790690393619",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Scheduled: Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "content": "Meeting scheduled for 2026-10-02 at 14:00. Agenda: Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "date": "2026-10-02",
+        "created_at": "2026-09-29T13:59:53.619Z"
+      },
+      {
+        "id": "int-1790690337901",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "content": "Full Live Meeting Transcript:\nAlex Morgan (AE): \"Hi Sarah, hi Mike! Thanks for jumping on today to review our 30-day implementation roadmap.\"\nSarah Johnson (VP Ops): \"Thanks Alex. As I mentioned earlier, our biggest priority is ensuring full deployment happens within 30 days so reporting turnarounds do not slip.\"\nMike Chen (Engineering): \"From an API standpoint, your integration docs look clean. We just need confirmation on dedicated technical support during week 1 setup.\"\nAlex Morgan (AE): \"Absolutely. We will assign a dedicated Lead Implementation Engineer for your account throughout the 30-day rollout.\"",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson",
+          "Mike Chen"
+        ],
+        "date": "2026-09-29",
+        "created_at": "2026-09-29T13:58:57.902Z"
+      },
+      {
+        "id": "int-1790690304887",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Scheduled: Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "content": "Meeting scheduled for 2026-10-02 at 14:00. Agenda: Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "date": "2026-10-02",
+        "created_at": "2026-09-29T13:58:24.887Z"
+      },
       {
         "id": "int-1790690008826",
         "deal_id": "deal-1790689251911",
@@ -488,6 +565,54 @@
     ],
     "deal-1790689251911": [
       {
+        "id": "mem-1790690461532-5wrr",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690461263",
+        "memory_type": "Objection",
+        "content": "Customer is concerned about deployment delays impacting operational workflow turnaround",
+        "importance": "High",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T14:01:01.532Z"
+      },
+      {
+        "id": "mem-1790690461532-eyvo",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690461263",
+        "memory_type": "Requirement",
+        "content": "Customer requires a guaranteed 30-day implementation plan prior to final contract execution",
+        "importance": "Critical",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T14:01:01.532Z"
+      },
+      {
+        "id": "mem-1790690338200-waee",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690337901",
+        "memory_type": "Objection",
+        "content": "Customer is concerned about deployment delays impacting operational workflow turnaround",
+        "importance": "High",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T13:58:58.200Z"
+      },
+      {
+        "id": "mem-1790690338200-vui4",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790690337901",
+        "memory_type": "Requirement",
+        "content": "Customer requires a guaranteed 30-day implementation plan prior to final contract execution",
+        "importance": "Critical",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T13:58:58.200Z"
+      },
+      {
         "id": "mem-1790690009106-cfle",
         "deal_id": "deal-1790689251911",
         "interaction_id": "int-1790690008826",
@@ -549,7 +674,7 @@
       "risk_reason": "Implementation objection is the single remaining friction point blocking contract signature.",
       "risk_mitigation": "Deliver a 30-day implementation milestone proposal with dedicated technical onboarding support.",
       "status": "Active",
-      "created_at": "2026-09-29T13:53:29.298Z"
+      "created_at": "2026-09-29T14:01:01.686Z"
     }
   },
   "meetings": {
@@ -574,6 +699,40 @@
     ],
     "deal-1790689251911": [
       {
+        "id": "mtg-1790690393500",
+        "deal_id": "deal-1790689251911",
+        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "date": "2026-10-02",
+        "time": "14:00",
+        "duration": "30 min",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "agenda": "Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
+        "meeting_link": "https://meet.google.com/new",
+        "status": "Scheduled",
+        "created_at": "2026-09-29T13:59:53.500Z"
+      },
+      {
+        "id": "mtg-1790690304742",
+        "deal_id": "deal-1790689251911",
+        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "date": "2026-10-02",
+        "time": "14:00",
+        "duration": "30 min",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "agenda": "Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
+        "meeting_link": "https://meet.google.com/new",
+        "status": "Scheduled",
+        "created_at": "2026-09-29T13:58:24.742Z"
+      },
+      {
         "id": "mtg-1790689874365",
         "deal_id": "deal-1790689251911",
         "title": "30-Day Implementation Planning Call",
@@ -592,5 +751,18 @@
       }
     ]
   },
-  "chatLogs": {}
+  "chatLogs": {
+    "deal-1790689251911": [
+      {
+        "role": "user",
+        "content": "What is the status",
+        "timestamp": "2026-09-29T13:56:14.016Z"
+      },
+      {
+        "role": "assistant",
+        "content": "According to persistent deal memory for **PhonePay**, the deal is currently in the **Discovery** stage ($1,00,000). Key stakeholders include Sarah Johnson (VP Ops) and Mike Chen (Eng). The main topic requiring resolution is providing a 30-day implementation plan to address customer objections against Salesforce.",
+        "timestamp": "2026-09-29T13:56:14.022Z"
+      }
+    ]
+  }
 }
