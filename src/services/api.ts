@@ -587,21 +587,36 @@ export async function fetchDealBrief(dealId: string): Promise<AIDealBrief> {
   } catch (err) {}
 
   const store = getLocalStore();
-  const deal = store.deals.find((d) => d.id === dealId) || store.deals[0];
-  const stakeholders = (store.stakeholders[dealId] || []).map((s) => `${s.name} (${s.title})`);
-  const memories = store.memories[dealId] || [];
-  const objections = memories.filter((m) => m.memory_type === 'Objection').map((m) => m.content);
-  const competitors = (store.competitors[dealId] || []).map((c) => c.name);
+  const deal = store.deals.find((d) => d.id === dealId) || (store.deals.length > 0 ? store.deals[0] : null);
+
+  if (!deal) {
+    return {
+      summary: 'No active deal selected. Create or select a deal to generate AI briefing.',
+      keyStakeholders: [],
+      mainObjections: [],
+      competitors: [],
+      buyingSignals: [],
+      currentRisk: 'Low',
+      riskExplanation: 'No risk detected.',
+      recommendedStrategy: 'Conduct initial discovery call with prospect.',
+      recommendedNextAction: 'Create deal opportunity',
+    };
+  }
+
+  const stakeholders = (store.stakeholders[dealId] || store.stakeholders[deal.id] || []).map((s) => `${s.name} (${s.title})`);
+  const memories = store.memories[dealId] || store.memories[deal.id] || [];
+  const objections = memories.filter((m) => (m.memory_type || '').toLowerCase().includes('objection')).map((m) => m.content);
+  const competitors = (store.competitors[dealId] || store.competitors[deal.id] || []).map((c) => c.name);
 
   return {
-    summary: `${deal.company} is currently in the ${deal.stage} stage with a deal value of $${deal.value.toLocaleString()}. Main priorities center on rapid deployment and workflow efficiency.`,
-    keyStakeholders: stakeholders.length > 0 ? stakeholders : ['Sarah Johnson (VP Ops)', 'Mike Chen (Engineering)'],
-    mainObjections: objections.length > 0 ? objections : ['Guaranteed 30-day onboarding timeline clarity'],
-    competitors: competitors.length > 0 ? competitors : ['Salesforce'],
-    buyingSignals: ['Engineering team endorsed technical architecture during product demo'],
+    summary: `${deal.company} is currently in the ${deal.stage} stage with a deal value of $${deal.value.toLocaleString()}. Priorities focus on deployment timelines and feature evaluation.`,
+    keyStakeholders: stakeholders.length > 0 ? stakeholders : [`Account Contact (${deal.company})`],
+    mainObjections: objections.length > 0 ? objections : ['Standard vendor technical & security evaluation'],
+    competitors: competitors.length > 0 ? competitors : ['Industry alternatives'],
+    buyingSignals: ['Active engagement and solution architecture review'],
     currentRisk: deal.risk_level,
-    riskExplanation: 'Customer requires concrete confirmation on onboarding timeline before contract sign-off.',
-    recommendedStrategy: 'Provide a structured 30-day implementation plan with dedicated technical onboarding support.',
+    riskExplanation: `Current deal risk level set to ${deal.risk_level}.`,
+    recommendedStrategy: deal.next_action,
     recommendedNextAction: deal.next_action,
   };
 }
@@ -614,23 +629,38 @@ export async function fetchBeforeCallBrief(dealId: string): Promise<BeforeCallBr
   } catch (err) {}
 
   const store = getLocalStore();
-  const deal = store.deals.find((d) => d.id === dealId) || store.deals[0];
+  const deal = store.deals.find((d) => d.id === dealId) || (store.deals.length > 0 ? store.deals[0] : null);
+
+  if (!deal) {
+    return {
+      headline: 'Pre-Call Strategy Briefing',
+      whatHappened: 'No active deal selected.',
+      whatMatters: ['Initial discovery'],
+      whatWorkedPreviously: 'N/A',
+      avoid: 'Avoid unaligned sales pitches',
+      recommendedApproach: 'Conduct structured discovery meeting',
+      suggestedTalkingPoints: ['Introduce platform capabilities'],
+    };
+  }
+
+  const memories = store.memories[dealId] || store.memories[deal.id] || [];
+  const reqs = memories.filter((m) => (m.memory_type || '').toLowerCase().includes('requirement')).map((m) => m.content);
 
   return {
     headline: `Pre-Call Strategy Briefing: ${deal.company}`,
-    whatHappened: `In recent discussions, ${deal.company} raised key questions regarding onboarding lead times and pricing transparency vs competitor benchmarks.`,
-    whatMatters: [
-      'Strict 30-day implementation requirement',
-      'Transparent onboarding cost breakdown',
-      'Engineering architecture alignment',
+    whatHappened: `Recent interaction recorded for ${deal.company}: ${deal.last_interaction}.`,
+    whatMatters: reqs.length > 0 ? reqs : [
+      'Timeline & deployment schedule alignment',
+      'Value proposition clarity',
+      'Security & architecture compliance',
     ],
-    whatWorkedPreviously: 'Live product demonstration highlighting real-time automation generated strong enthusiasm from technical stakeholders.',
-    avoid: 'Avoid presenting vague deployment timelines or pushing non-essential feature add-ons.',
-    recommendedApproach: 'Focus the call on presenting a clear 30-day implementation roadmap and assigning a dedicated onboarding engineer.',
+    whatWorkedPreviously: 'Solution demonstration highlighting key customer requirements.',
+    avoid: 'Avoid presenting vague timelines or unexpected pricing tiers.',
+    recommendedApproach: `Focus the discussion on ${deal.next_action.toLowerCase()}.`,
     suggestedTalkingPoints: [
-      'Walk through our 30-day phased onboarding timeline step by step.',
-      'Reiterate SOC2 security compliance and enterprise API stability.',
-      'Highlight total cost of ownership savings compared to alternative platforms.',
+      `Review ${deal.company}'s core business priorities.`,
+      `Deliver clear milestones for next steps.`,
+      `Confirm key stakeholder sign-off criteria.`,
     ],
   };
 }
@@ -758,15 +788,26 @@ export async function fetchFollowUpEmail(dealId: string): Promise<{ subject: str
   } catch (err) {}
 
   const store = getLocalStore();
-  const deal = store.deals.find((d) => d.id === dealId) || store.deals[0];
+  const deal = store.deals.find((d) => d.id === dealId) || (store.deals.length > 0 ? store.deals[0] : null);
+
+  if (!deal) {
+    return {
+      subject: 'Follow-up & Next Steps',
+      body: 'Hi,\n\nThank you for taking the time to speak with our team today.\n\nPlease let me know when you are available for a brief follow-up discussion.\n\nBest regards,\nNexusAI Deal Intelligence',
+      keyPointsAddressed: ['Initial alignment meeting'],
+    };
+  }
+
+  const memories = store.memories[dealId] || store.memories[deal.id] || [];
+  const reqs = memories.map((m) => m.content);
 
   return {
-    subject: `Follow-up: 30-Day Implementation Plan & Next Steps for ${deal.company}`,
-    body: `Hi Sarah,\n\nThank you for taking the time to speak with our team today regarding ${deal.company}'s workflow automation initiatives.\n\nAs discussed, we have outlined a concrete 30-day implementation roadmap tailored specifically to your operational requirements. Our engineering team is fully prepared to handle data setup and ensure a seamless onboarding experience.\n\nPlease let me know if 2:00 PM Thursday works for a brief 15-minute review with your team.\n\nBest regards,\n${deal.account_owner}\nNexusAI Deal Intelligence`,
-    keyPointsAddressed: [
-      'Confirmed 30-day onboarding commitment',
-      'Addressed transparent pricing structure',
-      'Assigned dedicated technical onboarding support',
+    subject: `Follow-up & Next Steps: ${deal.company}`,
+    body: `Hi,\n\nThank you for taking the time to speak with our team regarding ${deal.company}'s upcoming initiatives.\n\nAs discussed, we are preparing next steps focused on: "${deal.next_action}". Our team is committed to ensuring a seamless experience.\n\nPlease let me know if a brief 15-minute follow-up call this week works for your schedule.\n\nBest regards,\n${deal.account_owner}\nNexusAI Deal Intelligence`,
+    keyPointsAddressed: reqs.length > 0 ? reqs.slice(0, 3) : [
+      `Targeted next action: ${deal.next_action}`,
+      `Confirmed budget alignment for $${deal.value.toLocaleString()}`,
+      `Assigned technical account team`,
     ],
   };
 }
