@@ -47,12 +47,12 @@ class DBStore {
   }
 
   private initLocalStore() {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
 
-    if (fs.existsSync(STORE_FILE)) {
-      try {
+      if (fs.existsSync(STORE_FILE)) {
         const raw = fs.readFileSync(STORE_FILE, 'utf-8');
         this.localData = JSON.parse(raw);
         if (!this.localData.meetings) {
@@ -60,9 +60,9 @@ class DBStore {
         }
         console.log('Loaded persistent deal store from server/data/store.json');
         return;
-      } catch (err) {
-        console.warn('Error reading store.json, re-initializing with seed data');
       }
+    } catch (err) {
+      console.warn('Filesystem access warning, initializing in-memory store:', (err as Error).message);
     }
 
     this.resetToSeed();
@@ -86,9 +86,11 @@ class DBStore {
 
   private saveLocalStore() {
     try {
-      fs.writeFileSync(STORE_FILE, JSON.stringify(this.localData, null, 2), 'utf-8');
+      if (fs.existsSync(DATA_DIR)) {
+        fs.writeFileSync(STORE_FILE, JSON.stringify(this.localData, null, 2), 'utf-8');
+      }
     } catch (err) {
-      console.error('Failed to save store.json:', err);
+      console.warn('Unable to write store.json on serverless environment (operating in memory):', (err as Error).message);
     }
   }
 
@@ -129,7 +131,10 @@ class DBStore {
         console.error('PG query error', e);
       }
     }
-    return this.localData.deals;
+    if (!this.localData || !this.localData.deals || this.localData.deals.length === 0) {
+      this.resetToSeed();
+    }
+    return this.localData.deals || initialDeals;
   }
 
   public async getDealById(id: string): Promise<Deal | null> {
