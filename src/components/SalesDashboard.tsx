@@ -18,6 +18,7 @@ import {
   Activity,
   User,
   ChevronRight,
+  Briefcase,
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -283,8 +284,23 @@ export const SalesDashboard: React.FC<SalesDashboardProps> = ({
             <tbody className="divide-y divide-slate-800/60">
               {filteredDeals.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500">
-                    No deals match your search criteria.
+                  <td colSpan={8} className="py-12 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                        <Briefcase className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-slate-200">No active deals found in pipeline</p>
+                        <p className="text-xs text-slate-400">Click below to create your first deal and begin tracking deal intelligence & persistent memories.</p>
+                      </div>
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-glow transition-all flex items-center space-x-1.5 mt-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Create Deal</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ) : (
