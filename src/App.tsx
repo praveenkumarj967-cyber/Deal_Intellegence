@@ -228,6 +228,7 @@ export function App() {
           onClose={() => {}}
           onAuthSuccess={(user) => {
             setCurrentUser(user);
+            setIsAuthModalOpen(false);
             loadDashboard();
           }}
         />
