@@ -194,15 +194,18 @@ class DBStore {
       created_at: new Date().toISOString(),
     };
 
+    const clientName = (dealData as any).client_name || 'Primary Contact';
+    const clientEmail = (dealData as any).client_email || `contact@${newDeal.company.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
+
     const defaultStakeholder: Stakeholder = {
       id: `sh-${newDeal.id}-1`,
       deal_id: newDeal.id,
-      name: 'Primary Contact',
+      name: clientName,
       title: 'VP of Business Operations',
       role: 'Decision Maker',
-      email: 'contact@prospect.com',
+      email: clientEmail,
       sentiment: 'Positive',
-      notes: 'Interested in AI deal memory and next action guidance.',
+      notes: `Primary client contact for ${newDeal.company}.`,
     };
 
     const sb = getSupabaseClient();

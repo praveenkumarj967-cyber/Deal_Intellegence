@@ -42,6 +42,8 @@ export const SalesDashboard: React.FC<SalesDashboardProps> = ({
   // New Deal Form State
   const [newDealName, setNewDealName] = useState('');
   const [newCompany, setNewCompany] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
   const [newValue, setNewValue] = useState('100000');
   const [newStage, setNewStage] = useState<Deal['stage']>('Discovery');
   const [newOwner, setNewOwner] = useState('Alex Morgan');
@@ -72,10 +74,14 @@ export const SalesDashboard: React.FC<SalesDashboardProps> = ({
       risk_level: 'Medium',
       last_interaction: 'Created New Deal',
       next_action: 'Conduct discovery call and gather requirements',
-    });
+      client_name: clientName || 'Primary Contact',
+      client_email: clientEmail || `contact@${newCompany.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
+    } as any);
 
     setNewDealName('');
     setNewCompany('');
+    setClientName('');
+    setClientEmail('');
     setIsModalOpen(false);
   };
 
@@ -433,6 +439,31 @@ export const SalesDashboard: React.FC<SalesDashboardProps> = ({
                   onChange={(e) => setNewCompany(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-blue-500"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Client Contact Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. John Doe"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-300 mb-1">Client Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. john.doe@apex.com"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
 
               <div>

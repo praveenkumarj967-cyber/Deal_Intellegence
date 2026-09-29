@@ -135,7 +135,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
         `Assigned dedicated support engineer for account onboarding.`,
       ]);
 
-      if (customer?.company_name) {
+      if (p1.email) {
+        setRecipientEmail(p1.email);
+      } else if (customer?.company_name) {
         setRecipientEmail(`contact@${customer.company_name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`);
       }
     }
