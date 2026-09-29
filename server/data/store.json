@@ -14,7 +14,7 @@
       "last_interaction": "2026-09-29 - Meeting: Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
       "next_action": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
       "created_at": "2026-09-29T13:40:51.911Z",
-      "updated_at": "2026-09-29T15:47:48.560Z"
+      "updated_at": "2026-09-29T16:09:41.151Z"
     },
     {
       "id": "deal-1790689141697",
@@ -26,11 +26,11 @@
       "expected_close_date": "2026-10-29",
       "account_owner": "Alex Morgan",
       "deal_health": "Good",
-      "risk_level": "Low",
-      "last_interaction": "Deal Created",
-      "next_action": "Conduct initial discovery call",
+      "risk_level": "Medium",
+      "last_interaction": "2026-09-29 - Meeting: 30-Day Implementation Planning Call",
+      "next_action": "Schedule an implementation planning call with Sarah Johnson within the next 3 days.",
       "created_at": "2026-09-29T13:39:01.697Z",
-      "updated_at": "2026-09-29T13:39:01.697Z"
+      "updated_at": "2026-09-29T16:12:34.418Z"
     },
     {
       "id": "deal-1790688749805",
@@ -262,6 +262,27 @@
         "Cost effectiveness"
       ],
       "created_at": "2026-09-29T13:53:33.014368+00:00"
+    },
+    "deal-1790689141697": {
+      "id": "cust-deal-1790689141697",
+      "deal_id": "deal-1790689141697",
+      "company_name": "Stark Industries",
+      "industry": "Enterprise Technology",
+      "budget": "$1,80,000",
+      "timeline": "Q4 2026",
+      "current_solution": "Legacy solution",
+      "pain_points": [
+        "Manual processes",
+        "Limited reporting visibility"
+      ],
+      "company_requirements": [
+        "Modern automated platform",
+        "Rapid deployment"
+      ],
+      "priorities": [
+        "Efficiency improvement",
+        "Cost effectiveness"
+      ]
     }
   },
   "stakeholders": {
@@ -357,6 +378,16 @@
         "email": "",
         "sentiment": "Concerned",
         "notes": "Iterated requirement for strict 30-day rollout roadmap."
+      },
+      {
+        "id": "sh-1790698181001-4u00",
+        "deal_id": "deal-1790689251911",
+        "name": "Sarah Johnson",
+        "title": "VP of Operations",
+        "role": "Decision Maker",
+        "email": "",
+        "sentiment": "Concerned",
+        "notes": "Iterated requirement for strict 30-day rollout roadmap."
       }
     ]
   },
@@ -432,6 +463,20 @@
       }
     ],
     "deal-1790689251911": [
+      {
+        "id": "int-1790698180057",
+        "deal_id": "deal-1790689251911",
+        "type": "Meeting",
+        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
+        "content": "Full Live Meeting Transcript:\nAlex Morgan (AE): \"Hi Sarah, hi Mike! Thanks for jumping on today to review our 30-day implementation roadmap.\"\nSarah Johnson (VP Ops): \"Thanks Alex. As I mentioned earlier, our biggest priority is ensuring full deployment happens within 30 days so reporting turnarounds do not slip.\"\nMike Chen (Engineering): \"From an API standpoint, your integration docs look clean. We just need confirmation on dedicated technical support during week 1 setup.\"\nAlex Morgan (AE): \"Absolutely. We will assign a dedicated Lead Implementation Engineer for your account throughout the 30-day rollout.\"",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson",
+          "Mike Chen"
+        ],
+        "date": "2026-09-29",
+        "created_at": "2026-09-29T16:09:40.057Z"
+      },
       {
         "id": "int-1790696868034",
         "deal_id": "deal-1790689251911",
@@ -558,6 +603,36 @@
         "date": "2026-10-02",
         "created_at": "2026-09-29T13:51:14.533Z"
       }
+    ],
+    "deal-1790689141697": [
+      {
+        "id": "int-1790698353909",
+        "deal_id": "deal-1790689141697",
+        "type": "Meeting",
+        "title": "30-Day Implementation Planning Call",
+        "content": "Full Live Meeting Transcript:\n",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson",
+          "Mike Chen"
+        ],
+        "date": "2026-09-29",
+        "created_at": "2026-09-29T16:12:33.909Z"
+      },
+      {
+        "id": "int-1790698335563",
+        "deal_id": "deal-1790689141697",
+        "type": "Meeting",
+        "title": "Scheduled: 30-Day Implementation Planning Call",
+        "content": "Meeting scheduled for 2026-10-02 at 14:00. Agenda: Review 30-day implementation roadmap and transparent onboarding cost breakdown.",
+        "participants": [
+          "Alex Morgan",
+          "Sarah Johnson (VP Ops)",
+          "Mike Chen (Eng)"
+        ],
+        "date": "2026-10-02",
+        "created_at": "2026-09-29T16:12:15.563Z"
+      }
     ]
   },
   "memories": {
@@ -636,6 +711,30 @@
       }
     ],
     "deal-1790689251911": [
+      {
+        "id": "mem-1790698180907-189t",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790698180057",
+        "memory_type": "Objection",
+        "content": "Customer is concerned about deployment delays impacting operational workflow turnaround",
+        "importance": "High",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T16:09:40.907Z"
+      },
+      {
+        "id": "mem-1790698180907-3l60",
+        "deal_id": "deal-1790689251911",
+        "interaction_id": "int-1790698180057",
+        "memory_type": "Requirement",
+        "content": "Customer requires a guaranteed 30-day implementation plan prior to final contract execution",
+        "importance": "Critical",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T16:09:40.907Z"
+      },
       {
         "id": "mem-1790696868331-jizj",
         "deal_id": "deal-1790689251911",
@@ -780,6 +879,20 @@
         "resolved": false,
         "created_at": "2026-09-29T13:53:29.106Z"
       }
+    ],
+    "deal-1790689141697": [
+      {
+        "id": "mem-1790698354215-e2dc",
+        "deal_id": "deal-1790689141697",
+        "interaction_id": "int-1790698353909",
+        "memory_type": "Customer statement",
+        "content": "Full Live Meeting Transcript:\n",
+        "importance": "Medium",
+        "date": "2026-09-29",
+        "source_type": "Meeting",
+        "resolved": false,
+        "created_at": "2026-09-29T16:12:34.215Z"
+      }
     ]
   },
   "competitors": {
@@ -818,7 +931,19 @@
       "risk_reason": "Implementation objection is the single remaining friction point blocking contract signature.",
       "risk_mitigation": "Deliver a 30-day implementation milestone proposal with dedicated technical onboarding support.",
       "status": "Active",
-      "created_at": "2026-09-29T15:47:48.482Z"
+      "created_at": "2026-09-29T16:09:41.077Z"
+    },
+    "deal-1790689141697": {
+      "id": "rec-deal-1790689141697",
+      "deal_id": "deal-1790689141697",
+      "recommendation": "Schedule an implementation planning call with Sarah Johnson within the next 3 days.",
+      "reason": "The customer has repeatedly highlighted implementation timeframe as their top priority and condition for moving forward.",
+      "confidence": 88,
+      "risk_level": "Medium",
+      "risk_reason": "Implementation timeline objection has been raised across multiple interactions without a formal project plan delivered.",
+      "risk_mitigation": "Provide a structured 30-day implementation roadmap with defined weekly milestones before the next call.",
+      "status": "Active",
+      "created_at": "2026-09-29T16:12:34.294Z"
     }
   },
   "meetings": {
@@ -842,23 +967,6 @@
       }
     ],
     "deal-1790689251911": [
-      {
-        "id": "mtg-1790690393500",
-        "deal_id": "deal-1790689251911",
-        "title": "Schedule a 30-minute implementation planning meeting with Sarah Johnson to review the 30-day onboarding plan.",
-        "date": "2026-10-02",
-        "time": "14:00",
-        "duration": "30 min",
-        "participants": [
-          "Alex Morgan",
-          "Sarah Johnson (VP Ops)",
-          "Mike Chen (Eng)"
-        ],
-        "agenda": "Customer explicitly stated readiness to move forward if 30-day implementation concerns are addressed with a clear roadmap.",
-        "meeting_link": "https://meet.google.com/new",
-        "status": "Scheduled",
-        "created_at": "2026-09-29T13:59:53.500Z"
-      },
       {
         "id": "mtg-1790690304742",
         "deal_id": "deal-1790689251911",
@@ -893,7 +1001,8 @@
         "status": "Scheduled",
         "created_at": "2026-09-29T13:51:14.365Z"
       }
-    ]
+    ],
+    "deal-1790689141697": []
   },
   "chatLogs": {
     "deal-1790689251911": [

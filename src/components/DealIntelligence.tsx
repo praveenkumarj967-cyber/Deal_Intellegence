@@ -93,6 +93,10 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   const [isExtractionResultOpen, setIsExtractionResultOpen] = useState(false);
   const [extractionData, setExtractionData] = useState<ExtractionResponse | null>(null);
 
+  // Dynamic Speakers & Live Transcript derived from current Deal Stakeholders
+  const primaryStakeholder = stakeholders[0] || { name: 'Customer Executive', role: 'Decision Maker', title: 'VP' };
+  const secondaryStakeholder = stakeholders[1] || { name: 'Technical Lead', role: 'Evaluator', title: 'Lead' };
+
   // Live Virtual Meeting Room Modal State
   const [isLiveMeetingOpen, setIsLiveMeetingOpen] = useState(false);
   const [activeMeetingObj, setActiveMeetingObj] = useState<ScheduledMeeting | null>(null);
@@ -101,23 +105,41 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   const [callDurationSeconds, setCallDurationSeconds] = useState(0);
 
   // Live Real-Time Conversation Speaker Input State inside Meeting
-  const [liveSpeaker, setLiveSpeaker] = useState('Sarah Johnson (VP Ops)');
+  const [liveSpeaker, setLiveSpeaker] = useState(`${primaryStakeholder.name} (${primaryStakeholder.role})`);
   const [liveSpeakerText, setLiveSpeakerText] = useState('');
-  const [activeSpeakerName, setActiveSpeakerName] = useState('Sarah Johnson');
+  const [activeSpeakerName, setActiveSpeakerName] = useState(primaryStakeholder.name);
 
   // Live Transcript Feed & AI Agent Realtime Observations
-  const [liveTranscript, setLiveTranscript] = useState<Array<{ speaker: string; text: string; time: string }>>([
-    { speaker: 'Alex Morgan (AE)', text: 'Hi Sarah, hi Mike! Thanks for jumping on today to review our 30-day implementation roadmap.', time: '00:05' },
-    { speaker: 'Sarah Johnson (VP Ops)', text: 'Thanks Alex. As I mentioned earlier, our biggest priority is ensuring full deployment happens within 30 days so reporting turnarounds do not slip.', time: '00:18' },
-    { speaker: 'Mike Chen (Engineering)', text: 'From an API standpoint, your integration docs look clean. We just need confirmation on dedicated technical support during week 1 setup.', time: '00:32' },
-    { speaker: 'Alex Morgan (AE)', text: 'Absolutely. We will assign a dedicated Lead Implementation Engineer for your account throughout the 30-day rollout.', time: '00:45' },
-  ]);
+  const [liveTranscript, setLiveTranscript] = useState<Array<{ speaker: string; text: string; time: string }>>([]);
+  const [liveAIObservations, setLiveAIObservations] = useState<string[]>([]);
 
-  const [liveAIObservations, setLiveAIObservations] = useState<string[]>([
-    'Customer VP Ops Sarah Johnson emphasized strict 30-day onboarding deadline.',
-    'Engineering lead Mike Chen validated API integration architecture.',
-    'Assigned dedicated Lead Engineer to eliminate deployment risk.',
-  ]);
+  // Update live meeting attendees when deal data loads
+  useEffect(() => {
+    if (deal && stakeholders.length > 0) {
+      const p1 = stakeholders[0];
+      const p2 = stakeholders[1] || { name: 'Engineering Lead', role: 'Evaluator' };
+
+      setLiveSpeaker(`${p1.name} (${p1.role})`);
+      setActiveSpeakerName(p1.name);
+
+      setLiveTranscript([
+        { speaker: `${deal.account_owner} (AE)`, text: `Hi ${p1.name.split(' ')[0]}! Thanks for joining today to review our roadmap and project implementation.`, time: '00:05' },
+        { speaker: `${p1.name} (${p1.role})`, text: `Thanks ${deal.account_owner.split(' ')[0]}. Our main priority is ensuring smooth deployment and clear pricing transparency.`, time: '00:18' },
+        { speaker: `${p2.name} (${p2.role})`, text: `From a technical integration perspective, everything looks aligned. We just need final schedule confirmation.`, time: '00:32' },
+        { speaker: `${deal.account_owner} (AE)`, text: `Understood! We have allocated dedicated engineering support to ensure a seamless setup.`, time: '00:45' },
+      ]);
+
+      setLiveAIObservations([
+        `Customer key stakeholder ${p1.name} highlighted priority deployment timeline.`,
+        `Technical stakeholder ${p2.name} validated architecture requirements.`,
+        `Assigned dedicated support engineer for account onboarding.`,
+      ]);
+
+      if (customer?.company_name) {
+        setRecipientEmail(`contact@${customer.company_name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`);
+      }
+    }
+  }, [deal, stakeholders, customer]);
 
   // Content for Briefs & Features
   const [briefData, setBriefData] = useState<AIDealBrief | null>(null);
@@ -248,10 +270,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
 
     setLiveTranscript((prev) => [...prev, newTurn]);
 
-    // Update active speaker
-    if (liveSpeaker.includes('Sarah')) setActiveSpeakerName('Sarah Johnson');
-    else if (liveSpeaker.includes('Mike')) setActiveSpeakerName('Mike Chen');
-    else setActiveSpeakerName('Alex Morgan');
+    // Update active speaker dynamically
+    const matchedSpeakerName = liveSpeaker.split(' (')[0];
+    setActiveSpeakerName(matchedSpeakerName);
 
     // Autonomous AI Agent Action on the fly during the meeting!
     const textLower = liveSpeakerText.toLowerCase();
@@ -1173,24 +1194,24 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
               
               {/* Left Video Stage & Speaker Controls (7 cols) */}
               <div className="lg:col-span-7 p-4 bg-slate-950 flex flex-col justify-between space-y-4 overflow-y-auto">
-                {/* 3 Participant Cards */}
+                {/* Participant Cards derived from customer stakeholders */}
                 <div className="grid grid-cols-2 gap-3">
                   
-                  {/* Card 1: Sarah Johnson (VP Ops) */}
+                  {/* Card 1: Primary Stakeholder */}
                   <div className={`relative rounded-2xl bg-slate-900 border-2 p-3 transition-all flex flex-col items-center justify-center ${
-                    activeSpeakerName === 'Sarah Johnson' ? 'border-emerald-500/80 shadow-glow-emerald bg-emerald-950/20' : 'border-slate-800'
+                    activeSpeakerName === primaryStakeholder.name ? 'border-emerald-500/80 shadow-glow-emerald bg-emerald-950/20' : 'border-slate-800'
                   }`}>
                     <img
                       src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80"
-                      alt="Sarah Johnson"
+                      alt={primaryStakeholder.name}
                       className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-500/40"
                     />
                     <div className="mt-2 text-center">
-                      <p className="text-xs font-bold text-white">Sarah Johnson</p>
-                      <p className="text-[10px] text-slate-400">VP Operations (Decision Maker)</p>
+                      <p className="text-xs font-bold text-white">{primaryStakeholder.name}</p>
+                      <p className="text-[10px] text-slate-400">{primaryStakeholder.title || primaryStakeholder.role}</p>
                     </div>
 
-                    {activeSpeakerName === 'Sarah Johnson' && (
+                    {activeSpeakerName === primaryStakeholder.name && (
                       <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold flex items-center space-x-1">
                         <Volume2 className="w-3 h-3 text-emerald-400 animate-bounce" />
                         <span>Speaking</span>
@@ -1198,21 +1219,21 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
                     )}
                   </div>
 
-                  {/* Card 2: Mike Chen (Engineering) */}
+                  {/* Card 2: Secondary Stakeholder */}
                   <div className={`relative rounded-2xl bg-slate-900 border-2 p-3 transition-all flex flex-col items-center justify-center ${
-                    activeSpeakerName === 'Mike Chen' ? 'border-purple-500/80 shadow-glow-purple bg-purple-950/20' : 'border-slate-800'
+                    activeSpeakerName === secondaryStakeholder.name ? 'border-purple-500/80 shadow-glow-purple bg-purple-950/20' : 'border-slate-800'
                   }`}>
                     <img
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80"
-                      alt="Mike Chen"
+                      alt={secondaryStakeholder.name}
                       className="w-16 h-16 rounded-full object-cover ring-2 ring-purple-500/40"
                     />
                     <div className="mt-2 text-center">
-                      <p className="text-xs font-bold text-white">Mike Chen</p>
-                      <p className="text-[10px] text-slate-400">Engineering Manager</p>
+                      <p className="text-xs font-bold text-white">{secondaryStakeholder.name}</p>
+                      <p className="text-[10px] text-slate-400">{secondaryStakeholder.title || secondaryStakeholder.role}</p>
                     </div>
 
-                    {activeSpeakerName === 'Mike Chen' && (
+                    {activeSpeakerName === secondaryStakeholder.name && (
                       <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[9px] font-bold flex items-center space-x-1">
                         <Volume2 className="w-3 h-3 text-purple-400 animate-bounce" />
                         <span>Speaking</span>
@@ -1238,10 +1259,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
                       onChange={(e) => setLiveSpeaker(e.target.value)}
                       className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold"
                     >
-                      <option value="Sarah Johnson (VP Ops)">Sarah Johnson (VP Ops)</option>
-                      <option value="Mike Chen (Engineering)">Mike Chen (Eng)</option>
-                      <option value="Alex Morgan (AE)">Alex Morgan (AE)</option>
-                      <option value="David Vance (Procurement)">David Vance (Procurement)</option>
+                      <option value={`${primaryStakeholder.name} (${primaryStakeholder.role})`}>{primaryStakeholder.name} ({primaryStakeholder.role})</option>
+                      <option value={`${secondaryStakeholder.name} (${secondaryStakeholder.role})`}>{secondaryStakeholder.name} ({secondaryStakeholder.role})</option>
+                      <option value={`${deal.account_owner} (AE)`}>{deal.account_owner} (AE)</option>
                     </select>
 
                     <input
