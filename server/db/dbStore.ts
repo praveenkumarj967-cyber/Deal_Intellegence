@@ -124,7 +124,7 @@ class DBStore {
     if (this.isPostgresAvailable && this.pgPool) {
       try {
         const res = await this.pgPool.query('SELECT * FROM deals ORDER BY updated_at DESC');
-        return res.rows;
+        if (res.rows.length > 0) return res.rows;
       } catch (e) {
         console.error('PG query error', e);
       }
@@ -136,7 +136,7 @@ class DBStore {
     const sb = getSupabaseClient();
     if (sb) {
       try {
-        const { data, error } = await sb.from('deals').select('*').eq('id', id).single();
+        const { data, error } = await sb.from('deals').select('*').eq('id', id).maybeSingle();
         if (!error && data) return data as Deal;
       } catch (e) {}
     }
@@ -271,7 +271,7 @@ class DBStore {
     const sb = getSupabaseClient();
     if (sb) {
       try {
-        const { data, error } = await sb.from('customers').select('*').eq('deal_id', dealId).single();
+        const { data, error } = await sb.from('customers').select('*').eq('deal_id', dealId).maybeSingle();
         if (!error && data) return data as Customer;
       } catch (e) {}
     }
@@ -539,7 +539,7 @@ class DBStore {
     const sb = getSupabaseClient();
     if (sb) {
       try {
-        const { data, error } = await sb.from('recommendations').select('*').eq('deal_id', dealId).single();
+        const { data, error } = await sb.from('recommendations').select('*').eq('deal_id', dealId).maybeSingle();
         if (!error && data) return data as Recommendation;
       } catch (e) {}
     }
