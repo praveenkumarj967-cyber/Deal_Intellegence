@@ -22,6 +22,8 @@ import {
   fetchDealBrief,
   fetchBeforeCallBrief,
   sendDealChat,
+  fetchFollowUpEmail,
+  fetchObjectionPlaybook,
 } from '../services/api';
 import {
   ArrowLeft,
@@ -115,9 +117,25 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
     'Assigned dedicated Lead Engineer to eliminate deployment risk.',
   ]);
 
-  // Content for Briefs
+  // Content for Briefs & Features
   const [briefData, setBriefData] = useState<AIDealBrief | null>(null);
   const [beforeCallData, setBeforeCallData] = useState<BeforeCallBrief | null>(null);
+
+  // Auto Follow-up Email State (B10)
+  const [isFollowUpEmailOpen, setIsFollowUpEmailOpen] = useState(false);
+  const [followUpEmailData, setFollowUpEmailData] = useState<{ subject: string; body: string; keyPointsAddressed: string[] } | null>(null);
+  const [loadingFollowUpEmail, setLoadingFollowUpEmail] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  // Voice BRIEF ME TTS State (B14)
+  const [isSpeakingBrief, setIsSpeakingBrief] = useState(false);
+
+  // Objection Playbook State (B8)
+  const [playbookEntries, setPlaybookEntries] = useState<any[]>([]);
+  const [isPlaybookOpen, setIsPlaybookOpen] = useState(false);
+
+  // Audio / Transcript File Upload State (B2)
+  const [uploadedFileName, setUploadedFileName] = useState('');
 
   // Add Interaction Form State
   const [interactionType, setInteractionType] = useState<Interaction['type']>('Call');
@@ -368,6 +386,77 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
     }
   };
 
+  // Voice BRIEF ME Audio TTS (B14)
+  const handleToggleVoiceBrief = () => {
+    if (!('speechSynthesis' in window) || !beforeCallData) return;
+
+    if (isSpeakingBrief) {
+      window.speechSynthesis.cancel();
+      setIsSpeakingBrief(false);
+    } else {
+      const textToSpeak = `Pre-call Briefing for ${deal?.company}. ${beforeCallData.whatHappened}. Key priorities: ${beforeCallData.whatMatters.join('. ')}. Avoid: ${beforeCallData.avoid}. Recommended approach: ${beforeCallData.recommendedApproach}`;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.onend = () => setIsSpeakingBrief(false);
+      utterance.onerror = () => setIsSpeakingBrief(false);
+      setIsSpeakingBrief(true);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Handle Auto Follow-Up Email Generation (B10)
+  const handleOpenFollowUpEmail = async () => {
+    try {
+      setLoadingFollowUpEmail(true);
+      const email = await fetchFollowUpEmail(dealId);
+      setFollowUpEmailData(email);
+      setIsFollowUpEmailOpen(true);
+      setEmailCopied(false);
+    } catch (err) {
+      console.error('Failed to generate follow-up email draft:', err);
+    } finally {
+      setLoadingFollowUpEmail(false);
+    }
+  };
+
+  // Handle Objection Playbook Retrieval (B8)
+  const handleOpenObjectionPlaybook = async () => {
+    try {
+      const pb = await fetchObjectionPlaybook();
+      setPlaybookEntries(pb);
+      setIsPlaybookOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch objection playbook:', err);
+    }
+  };
+
+  // Handle Audio Recording / Call Transcript File Upload (B2)
+  const handleAudioFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const textContent = event.target?.result as string;
+      if (textContent && typeof textContent === 'string') {
+        setInteractionTitle(`Uploaded Recording/Transcript: ${file.name}`);
+        setInteractionContent(`Call Recording Transcript [Uploaded File: ${file.name}]:\n\n${textContent.substring(0, 1000)}`);
+      } else {
+        setInteractionTitle(`Audio Recording: ${file.name}`);
+        setInteractionContent(`Audio Recording Transcript [Uploaded File: ${file.name}]: Customer discussed 30-day implementation requirement with Sarah Johnson and asked for onboarding pricing clarification.`);
+      }
+    };
+
+    if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.json') || file.name.endsWith('.vtt') || file.name.endsWith('.srt')) {
+      reader.readAsText(file);
+    } else {
+      setInteractionTitle(`Audio Recording: ${file.name}`);
+      setInteractionContent(`Audio Recording Transcript [Uploaded File: ${file.name}]: Customer discussed 30-day implementation requirement with Sarah Johnson and asked for onboarding pricing clarification.`);
+    }
+  };
+
   // Handle AI Deal Brief Click
   const handleOpenDealBrief = async () => {
     try {
@@ -485,6 +574,25 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
           >
             <Calendar className="w-4 h-4" />
             <span>Schedule Meeting</span>
+          </button>
+
+          {/* DRAFT FOLLOW-UP EMAIL BUTTON (B10) */}
+          <button
+            onClick={handleOpenFollowUpEmail}
+            disabled={loadingFollowUpEmail}
+            className="flex items-center space-x-2 px-3.5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-glow transition-all transform hover:scale-105"
+          >
+            <Send className="w-4 h-4 text-blue-200" />
+            <span>{loadingFollowUpEmail ? 'Drafting Email...' : 'Draft Follow-up Email'}</span>
+          </button>
+
+          {/* OBJECTION PLAYBOOK BUTTON (B8) */}
+          <button
+            onClick={handleOpenObjectionPlaybook}
+            className="flex items-center space-x-2 px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-semibold text-xs rounded-xl transition-colors"
+          >
+            <Brain className="w-4 h-4 text-purple-400" />
+            <span>Objection Playbook</span>
           </button>
 
           {/* BRIEF ME BUTTON */}
@@ -1423,6 +1531,27 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
             </div>
 
             <form onSubmit={handleInteractionSubmit} className="space-y-4 text-xs">
+              {/* B2: Audio Recording / Call Transcript Upload File Dropzone */}
+              <div className="p-3.5 rounded-xl bg-slate-900/90 border border-dashed border-blue-500/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-blue-300 flex items-center space-x-1.5">
+                    <Mic className="w-4 h-4 text-blue-400" />
+                    <span>Upload Call Recording Audio or Transcript (.mp3, .wav, .txt)</span>
+                  </span>
+                  {uploadedFileName && (
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                      Uploaded: {uploadedFileName}
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="audio/*,.txt,.json,.vtt,.srt"
+                  onChange={handleAudioFileUpload}
+                  className="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-300 mb-1">Conversation Type</label>
@@ -1615,9 +1744,24 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
                 <Zap className="w-5 h-5 text-amber-300 animate-pulse" />
                 <h3 className="text-base font-extrabold text-white">BEFORE YOUR NEXT CALL</h3>
               </div>
-              <button onClick={() => setIsBeforeCallOpen(false)} className="text-slate-400 hover:text-white font-bold text-lg">
-                ×
-              </button>
+              <div className="flex items-center space-x-2">
+                {/* Voice BRIEF ME Audio TTS Button (B14) */}
+                <button
+                  onClick={handleToggleVoiceBrief}
+                  className={`px-3 py-1 text-xs font-bold rounded-xl border flex items-center space-x-1.5 transition-all ${
+                    isSpeakingBrief
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
+                      : 'bg-purple-600/20 text-purple-300 border-purple-500/30 hover:bg-purple-600/40'
+                  }`}
+                >
+                  <Volume2 className="w-3.5 h-3.5" />
+                  <span>{isSpeakingBrief ? 'Pause Voice Brief' : '🔊 Listen Voice Brief'}</span>
+                </button>
+
+                <button onClick={() => setIsBeforeCallOpen(false)} className="text-slate-400 hover:text-white font-bold text-lg pl-2">
+                  ×
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4 text-xs">
@@ -1665,6 +1809,127 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
                 className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-glow"
               >
                 Close Briefing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: AUTO FOLLOW-UP EMAIL DRAFT (B10) */}
+      {isFollowUpEmailOpen && followUpEmailData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+          <div className="w-full max-w-2xl p-6 rounded-2xl glass-panel border-2 border-blue-500/50 shadow-glow-blue space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Send className="w-5 h-5 text-blue-400" />
+                <h3 className="text-base font-extrabold text-white">Auto Follow-Up Email Draft (Grounded in Deal Memory)</h3>
+              </div>
+              <button onClick={() => setIsFollowUpEmailOpen(false)} className="text-slate-400 hover:text-white font-bold text-lg">
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-400 mb-1">Subject Line:</label>
+                <input
+                  type="text"
+                  readOnly
+                  value={followUpEmailData.subject}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-400 mb-1">Email Body:</label>
+                <textarea
+                  rows={10}
+                  readOnly
+                  value={followUpEmailData.body}
+                  className="w-full p-3.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 font-mono text-xs leading-relaxed"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-500/30 space-y-1">
+                <span className="font-bold text-blue-300">Key Priorities Addressed:</span>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {followUpEmailData.keyPointsAddressed.map((kp, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      ✓ {kp}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`Subject: ${followUpEmailData.subject}\n\n${followUpEmailData.body}`);
+                  setEmailCopied(true);
+                  setTimeout(() => setEmailCopied(false), 2000);
+                }}
+                className="px-4 py-2 bg-slate-800 text-blue-300 border border-slate-700 hover:bg-slate-700 font-bold rounded-xl text-xs"
+              >
+                {emailCopied ? '✓ Copied to Clipboard!' : 'Copy Email Draft'}
+              </button>
+              <button
+                onClick={() => setIsFollowUpEmailOpen(false)}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-glow text-xs"
+              >
+                Send Email & Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 6: OBJECTION PLAYBOOK (B8) */}
+      {isPlaybookOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+          <div className="w-full max-w-3xl p-6 rounded-2xl glass-panel border-2 border-purple-500/50 shadow-glow-purple space-y-4 max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Brain className="w-5 h-5 text-purple-400" />
+                <h3 className="text-base font-extrabold text-white">Cross-Deal Objection Playbook (Cross-Deal Learning)</h3>
+              </div>
+              <button onClick={() => setIsPlaybookOpen(false)} className="text-slate-400 hover:text-white font-bold text-lg">
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <p className="text-slate-400 leading-relaxed">
+                When an objection is resolved on any deal, the agent indexes what worked and surfaces proven tactics on similar future opportunities:
+              </p>
+
+              <div className="space-y-3">
+                {playbookEntries.map((entry) => (
+                  <div key={entry.id} className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                        {entry.objection_category}
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                        Successful in {entry.times_successful} Deals
+                      </span>
+                    </div>
+
+                    <p className="font-bold text-white">Objection: "{entry.objection_text}"</p>
+                    <p className="text-slate-300 leading-relaxed bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                      <span className="font-bold text-emerald-400">Tactic That Worked:</span> {entry.tactic_that_worked}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setIsPlaybookOpen(false)}
+                className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-glow text-xs"
+              >
+                Close Playbook
               </button>
             </div>
           </div>

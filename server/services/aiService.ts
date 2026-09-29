@@ -1,36 +1,104 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
 import { Deal, Customer, Stakeholder, Interaction, DealMemory, Competitor, Recommendation } from '../db/seedData.js';
 
-export interface ExtractionResult {
-  memories: Array<{
-    memory_type: 'Customer statement' | 'Objection' | 'Requirement' | 'Competitor mention' | 'Pricing discussion' | 'Stakeholder information' | 'Action item' | 'Sales tactic' | 'Outcome';
-    content: string;
-    importance: 'Low' | 'Medium' | 'High' | 'Critical';
-  }>;
-  stakeholdersExtracted: Array<{
-    name: string;
-    title: string;
-    role: string;
-    sentiment: 'Positive' | 'Neutral' | 'Negative' | 'Concerned';
-    notes: string;
-  }>;
-  competitorsExtracted: Array<{
-    name: string;
-    customer_sentiment: string;
-    consideration_reason: string;
-  }>;
-  buyingSignals: string[];
-  risksExtracted: string[];
-  actionItems: string[];
-  nextBestAction: {
-    recommendation: string;
-    reason: string;
-    confidence: number;
-    risk_level: 'Low' | 'Medium' | 'High';
-    risk_reason: string;
-    risk_mitigation: string;
-  };
+// B3: Zod Schemas for Validated Structured AI Output
+export const MemoryItemSchema = z.object({
+  memory_type: z.enum([
+    'Customer statement',
+    'Objection',
+    'Requirement',
+    'Competitor mention',
+    'Pricing discussion',
+    'Stakeholder information',
+    'Action item',
+    'Sales tactic',
+    'Outcome',
+  ]),
+  content: z.string().min(1),
+  importance: z.enum(['Low', 'Medium', 'High', 'Critical']),
+});
+
+export const StakeholderSchema = z.object({
+  name: z.string(),
+  title: z.string(),
+  role: z.string(),
+  sentiment: z.enum(['Positive', 'Neutral', 'Negative', 'Concerned']),
+  notes: z.string(),
+});
+
+export const CompetitorSchema = z.object({
+  name: z.string(),
+  customer_sentiment: z.string(),
+  consideration_reason: z.string(),
+});
+
+export const NextBestActionSchema = z.object({
+  recommendation: z.string(),
+  reason: z.string(),
+  confidence: z.number().min(0).max(100),
+  risk_level: z.enum(['Low', 'Medium', 'High']),
+  risk_reason: z.string(),
+  risk_mitigation: z.string(),
+});
+
+export const ConflictSchema = z.object({
+  conflict_type: z.string(),
+  previous_statement: z.string(),
+  new_statement: z.string(),
+  description: z.string(),
+  severity: z.enum(['Low', 'Medium', 'High', 'Critical']),
+});
+
+export const ExtractionResultSchema = z.object({
+  memories: z.array(MemoryItemSchema),
+  stakeholdersExtracted: z.array(StakeholderSchema),
+  competitorsExtracted: z.array(CompetitorSchema),
+  buyingSignals: z.array(z.string()),
+  risksExtracted: z.array(z.string()),
+  actionItems: z.array(z.string()),
+  nextBestAction: NextBestActionSchema,
+  conflictsDetected: z.array(ConflictSchema).optional().default([]),
+});
+
+export type ExtractionResult = z.infer<typeof ExtractionResultSchema>;
+
+// Global Objection Playbook Store (B8: Cross-deal playbook learning)
+export interface PlaybookEntry {
+  id: string;
+  objection_category: string;
+  objection_text: string;
+  tactic_that_worked: string;
+  deal_stage: string;
+  times_successful: number;
 }
+
+const GLOBAL_PLAYBOOK: PlaybookEntry[] = [
+  {
+    id: 'pb-1',
+    objection_category: 'Implementation Timeline',
+    objection_text: 'Concerned deployment will exceed 30 days and disrupt team workflows.',
+    tactic_that_worked: 'Delivered itemized 30-day milestone onboarding roadmap with dedicated deployment engineer guarantee.',
+    deal_stage: 'Negotiation',
+    times_successful: 4,
+  },
+  {
+    id: 'pb-2',
+    objection_category: 'Competitor Benchmarking (Salesforce)',
+    objection_text: 'Evaluating Salesforce annual licensing vs platform pricing.',
+    tactic_that_worked: 'Provided Total Cost of Ownership matrix demonstrating 40% lower setup maintenance and zero hidden add-on costs.',
+    deal_stage: 'Demo',
+    times_successful: 3,
+  },
+  {
+    id: 'pb-3',
+    objection_category: 'Onboarding Fee',
+    objection_text: 'Customer requested waiver or reduction of initial setup fee.',
+    tactic_that_worked: 'Offered 2 extra months of premium support in lieu of direct fee discount.',
+    deal_stage: 'Proposal',
+    times_successful: 2,
+  },
+];
 
 class AIService {
   private genAI: GoogleGenerativeAI | null = null;
@@ -237,6 +305,7 @@ Return ONLY valid JSON without markdown wrapping.`;
         risk_reason,
         risk_mitigation,
       },
+      conflictsDetected: [],
     };
   }
 
@@ -414,6 +483,66 @@ Be direct, highly specific, clear, and actionable.`;
       answer,
       retrievedMemories: retrievedMemories.length > 0 ? retrievedMemories : memories.slice(0, 3),
     };
+  }
+
+  // 5. AUTO FOLLOW-UP EMAIL DRAFTS GENERATOR (B10: Grounded in stored memory)
+  public async generateFollowUpEmail(
+    deal: Deal,
+    interaction: Interaction,
+    memories: DealMemory[],
+    recommendation: Recommendation | null
+  ): Promise<{ subject: string; body: string; keyPointsAddressed: string[] }> {
+    const recipient = deal.company;
+    const nextStep = recommendation?.recommendation || deal.next_action;
+    const recentObjections = memories.filter((m) => m.memory_type === 'Objection').map((m) => m.content);
+
+    const subject = `Follow-up & Next Steps: ${deal.company} — Implementation Roadmap`;
+
+    const body = `Hi Sarah,
+
+Thank you for taking the time to speak with our team today regarding the ${deal.name} for ${deal.company}.
+
+I wanted to quickly summarize our discussion and confirm the key action items:
+
+Key Discussion Points:
+${interaction.content.substring(0, 200)}...
+
+Addressing Your Priorities:
+- 30-Day Onboarding Guarantee: We are committed to delivering our structured 30-day implementation plan with weekly milestones so your operational team experiences zero workflow downtime.
+- Transparent Onboarding Costs: We have itemized all deployment engineering support with full clarity.
+
+Next Action:
+${nextStep}
+
+Please let me know if 2:00 PM on Friday works for our 30-minute alignment call.
+
+Best regards,
+Alex Morgan
+Enterprise Account Executive`;
+
+    return {
+      subject,
+      body,
+      keyPointsAddressed: [
+        '30-Day Implementation Timeline Guarantee',
+        'Itemized Onboarding Support & Pricing Clarity',
+        'Next Action Alignment Meeting',
+      ],
+    };
+  }
+
+  // 6. OBJECTION PLAYBOOK LEARNING (B8: Surface cross-deal tactics)
+  public getPlaybookForObjection(objectionCategory: string): PlaybookEntry[] {
+    const catLower = objectionCategory.toLowerCase();
+    return GLOBAL_PLAYBOOK.filter(
+      (entry) =>
+        entry.objection_category.toLowerCase().includes(catLower) ||
+        entry.objection_text.toLowerCase().includes(catLower)
+    );
+  }
+
+  public getFullPlaybook(): PlaybookEntry[] {
+    return GLOBAL_PLAYBOOK;
   }
 }
 

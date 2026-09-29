@@ -121,6 +121,31 @@ export async function sendDealChat(
   return res.json();
 }
 
+export async function fetchFollowUpEmail(dealId: string): Promise<{ subject: string; body: string; keyPointsAddressed: string[] }> {
+  const res = await fetch(`${API_BASE}/deals/${dealId}/followup-email`);
+  if (!res.ok) throw new Error('Failed to generate follow-up email draft');
+  return res.json();
+}
+
+export async function fetchObjectionPlaybook(objection?: string): Promise<any[]> {
+  const url = objection ? `${API_BASE}/playbook?objection=${encodeURIComponent(objection)}` : `${API_BASE}/playbook`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch objection playbook');
+  return res.json();
+}
+
+export async function fetchStalledDeals(): Promise<any[]> {
+  const res = await fetch(`${API_BASE}/stalled-deals`);
+  if (!res.ok) throw new Error('Failed to fetch stalled deals');
+  return res.json();
+}
+
+export async function fetchEvalResults(): Promise<{ passRate: number; totalTests: number; testsPassed: number; goldenSetResults: any[] }> {
+  const res = await fetch(`${API_BASE}/eval`);
+  if (!res.ok) throw new Error('Failed to run eval benchmark suite');
+  return res.json();
+}
+
 export async function resetDemoData(): Promise<void> {
   await fetch(`${API_BASE}/reset`, { method: 'POST' });
 }
