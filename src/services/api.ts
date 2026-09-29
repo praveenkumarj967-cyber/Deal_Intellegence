@@ -661,7 +661,15 @@ export async function sendDealChat(
   } catch (err) {}
 
   const store = getLocalStore();
-  const deal = store.deals.find((d) => d.id === dealId) || store.deals[0];
+  const deal = store.deals.find((d) => d.id === dealId) || (store.deals.length > 0 ? store.deals[0] : null);
+
+  if (!deal) {
+    return {
+      answer: "No active deal context selected. Please select or create an active deal to query deal intelligence memory.",
+      retrievedMemories: [],
+    };
+  }
+
   const memories = store.memories[dealId] || store.memories[deal.id] || [];
   const stakeholders = store.stakeholders[dealId] || store.stakeholders[deal.id] || [];
   const competitors = store.competitors[dealId] || store.competitors[deal.id] || [];
@@ -672,52 +680,68 @@ export async function sendDealChat(
 
   // Search through deal memories for relevant context
   const matchedMemories = memories.filter((m) => {
-    const text = m.content.toLowerCase();
-    const type = m.memory_type.toLowerCase();
+    const text = (m.content || '').toLowerCase();
+    const type = (m.memory_type || '').toLowerCase();
     return q.split(/\s+/).some((word) => word.length > 2 && (text.includes(word) || type.includes(word)));
   });
 
   const activeMemories = matchedMemories.length > 0 ? matchedMemories : memories;
-  const objections = memories.filter((m) => m.memory_type.toLowerCase().includes('objection') || m.content.toLowerCase().includes('objection') || m.content.toLowerCase().includes('concern') || m.content.toLowerCase().includes('cost'));
-  const competitorsMentioned = competitors.map((c) => c.name).join(', ') || 'Salesforce';
+  const objections = memories.filter((m) => (m.memory_type || '').toLowerCase().includes('objection') || (m.content || '').toLowerCase().includes('objection') || (m.content || '').toLowerCase().includes('concern') || (m.content || '').toLowerCase().includes('cost'));
+  const competitorsMentioned = competitors.map((c) => c.name).join(', ') || 'None identified yet';
   const decisionMakers = stakeholders.map((s) => `${s.name} (${s.title}, Sentiment: ${s.sentiment})`).join('; ');
 
   let answer = '';
 
-  if (q.includes('objection') || q.includes('concern') || q.includes('risk') || q.includes('problem')) {
+  if (q.includes('summary') || q.includes('interaction') || q.includes('week') || q.includes('history') || q.includes('recent') || q.includes('activity')) {
+    if (interactions.length > 0) {
+      answer = `Summary of Recent Interactions for ${deal.company}:\n` +
+        interactions.map((i) => `• [${i.type} on ${i.date}]: ${i.title} — ${i.content}`).join('\n') +
+        `\n\nCurrent Next Action: ${deal.next_action}`;
+    } else if (memories.length > 0) {
+      answer = `Indexed Memory Summary for ${deal.company}:\n` +
+        memories.map((m) => `• [${m.memory_type} on ${m.date}]: ${m.content}`).join('\n');
+    } else {
+      answer = `Summary for ${deal.company}:\n` +
+        `• Stage: ${deal.stage} ($${deal.value.toLocaleString()})\n` +
+        `• Health: ${deal.deal_health} (Risk: ${deal.risk_level})\n` +
+        `• Last Interaction: ${deal.last_interaction}\n` +
+        `• Next Recommended Action: ${deal.next_action}`;
+    }
+  } else if (q.includes('objection') || q.includes('concern') || q.includes('risk') || q.includes('problem')) {
     answer = `Based on indexed deal memory for ${deal.company}, key objections and concerns are:\n` +
-      objections.map((o) => `• [${o.memory_type}] ${o.content} (Importance: ${o.importance})`).join('\n') +
+      (objections.length > 0
+        ? objections.map((o) => `• [${o.memory_type}] ${o.content} (Importance: ${o.importance})`).join('\n')
+        : '• No active critical objections currently recorded for this deal.') +
       `\n\n🎯 Recommended Tactic: ${deal.next_action}`;
-  } else if (q.includes('competitor') || q.includes('salesforce') || q.includes('hubspot') || q.includes('vs')) {
+  } else if (q.includes('competitor') || q.includes('vs') || q.includes('benchmark')) {
     answer = `Competitor Intelligence for ${deal.company}:\n` +
       (competitors.length > 0
-        ? competitors.map((c) => `• Competitor: ${c.name} | Sentiment: ${c.customer_sentiment} | Reason: ${c.consideration_reason} | Strategy: ${c.address_strategy}`).join('\n')
-        : `• Primary competitor is ${competitorsMentioned}. Key strategy: Highlight 3x faster setup speed and lower total cost of ownership.`) +
-      `\n\nWinning Tactic: Emphasize our native API flexibility and dedicated 30-day onboarding engineer guarantee.`;
+        ? competitors.map((c) => `• Competitor: ${c.name} | Sentiment: ${c.customer_sentiment} | Strategy: ${c.address_strategy}`).join('\n')
+        : `• No direct competitors currently recorded for this opportunity.`) +
+      `\n\nWinning Tactic: Emphasize platform capability, security compliance, and rapid implementation.`;
   } else if (q.includes('stakeholder') || q.includes('who') || q.includes('contact') || q.includes('decision maker') || q.includes('buyer')) {
     answer = `Key Stakeholders mapped for ${deal.company}:\n` +
       (stakeholders.length > 0
         ? stakeholders.map((s) => `• ${s.name} - ${s.title} (${s.role}). Sentiment: ${s.sentiment}. Notes: ${s.notes}`).join('\n')
-        : `• Primary contacts: Sarah Johnson (VP Ops) and Mike Chen (Engineering Manager).`);
+        : `• Primary account owner: ${deal.account_owner}`);
   } else if (q.includes('price') || q.includes('pricing') || q.includes('budget') || q.includes('cost') || q.includes('value')) {
     answer = `Financial & Budget Overview for ${deal.company}:\n` +
       `• Deal Value: $${deal.value.toLocaleString()}\n` +
-      `• Budget: ${customer?.budget || '$100,000 - $130,000 (Annual)'}\n` +
-      `• Pricing Notes: Customer requested annual billing structure and raised questions regarding initial onboarding service costs.`;
+      `• Target Close Date: ${deal.expected_close_date}\n` +
+      `• Budget: ${customer?.budget || 'Not specified'}`;
   } else if (matchedMemories.length > 0) {
     answer = `Indexed Deal Memories for ${deal.company} matching "${message}":\n` +
       matchedMemories.map((m) => `• [${m.memory_type} | ${m.source_type} on ${m.date}]: ${m.content}`).join('\n') +
       `\n\nDeal Status: Stage "${deal.stage}" ($${deal.value.toLocaleString()}), Health: ${deal.deal_health}. Next Action: ${deal.next_action}`;
   } else {
-    answer = `Deal Summary for ${deal.company} (${deal.name}):\n` +
+    answer = `Current State of ${deal.company} (${deal.name}):\n` +
       `• Stage: ${deal.stage} ($${deal.value.toLocaleString()} | ${deal.probability}% Probability)\n` +
       `• Account Owner: ${deal.account_owner}\n` +
-      `• Deal Health: ${deal.deal_health} (Risk: ${deal.risk_level})\n` +
-      `• Key Decision Makers: ${decisionMakers || 'Sarah Johnson (VP Ops), Mike Chen (Engineering Manager)'}\n` +
+      `• Deal Health: ${deal.deal_health} (Risk Level: ${deal.risk_level})\n` +
+      `• Key Decision Makers: ${decisionMakers || deal.account_owner}\n` +
       `• Competitors Mapped: ${competitorsMentioned}\n` +
-      `• Recent Interaction: ${deal.last_interaction}\n` +
-      `• Next Action: ${deal.next_action}\n` +
-      `• Key Objections Recorded: ${objections.map((o) => o.content).join('; ') || 'Guaranteed 30-day implementation timeline clarity'}`;
+      `• Last Recorded Activity: ${deal.last_interaction}\n` +
+      `• Next Action: ${deal.next_action}`;
   }
 
   return {
