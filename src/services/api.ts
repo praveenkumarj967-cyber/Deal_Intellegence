@@ -140,6 +140,24 @@ export async function fetchStalledDeals(): Promise<any[]> {
   return res.json();
 }
 
+export async function sendEmail(dealId: string, emailData: { to: string; subject: string; body: string }): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/deals/${dealId}/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(emailData),
+  });
+  if (!res.ok) throw new Error('Failed to send email');
+  return res.json();
+}
+
+export async function deleteMeeting(meetingId: string): Promise<{ success: boolean }> {
+  const res = await fetch(`${API_BASE}/meetings/${meetingId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to remove meeting');
+  return res.json();
+}
+
 export async function fetchEvalResults(): Promise<{ passRate: number; totalTests: number; testsPassed: number; goldenSetResults: any[] }> {
   const res = await fetch(`${API_BASE}/eval`);
   if (!res.ok) throw new Error('Failed to run eval benchmark suite');

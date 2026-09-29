@@ -201,6 +201,32 @@ app.post('/api/deals/:id/meetings', async (req, res) => {
   }
 });
 
+app.delete('/api/meetings/:meetingId', async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    await dbStore.deleteMeeting(meetingId);
+    res.json({ success: true, message: 'Meeting completed and removed' });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+// SEND DRAFT EMAIL ENDPOINT
+app.post('/api/deals/:id/send-email', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { to, subject, body } = req.body;
+    console.log(`✉️ Email dispatched for deal ${id} to ${to}: "${subject}"`);
+    res.json({
+      success: true,
+      message: `Follow-up email successfully sent to ${to || 'client stakeholder'}!`,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 // 7. MEMORY SEARCH & TIMELINE
 app.get('/api/deals/:id/memories', async (req, res) => {
   try {

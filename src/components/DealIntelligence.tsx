@@ -24,6 +24,8 @@ import {
   sendDealChat,
   fetchFollowUpEmail,
   fetchObjectionPlaybook,
+  sendEmail,
+  deleteMeeting,
 } from '../services/api';
 import {
   ArrowLeft,
@@ -126,6 +128,9 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   const [followUpEmailData, setFollowUpEmailData] = useState<{ subject: string; body: string; keyPointsAddressed: string[] } | null>(null);
   const [loadingFollowUpEmail, setLoadingFollowUpEmail] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState('sarah.johnson@acme.com');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSentSuccess, setEmailSentSuccess] = useState('');
 
   // Voice BRIEF ME TTS State (B14)
   const [isSpeakingBrief, setIsSpeakingBrief] = useState(false);
@@ -288,6 +293,15 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
         date: new Date().toISOString().split('T')[0],
       });
 
+      // Remove completed meeting from dashboard schedule
+      if (activeMeetingObj?.id) {
+        try {
+          await deleteMeeting(activeMeetingObj.id);
+        } catch (e) {
+          console.warn('Failed to remove completed meeting:', e);
+        }
+      }
+
       setExtractionData(response);
       setIsExtractionResultOpen(true);
       await loadData();
@@ -409,6 +423,7 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
   const handleOpenFollowUpEmail = async () => {
     try {
       setLoadingFollowUpEmail(true);
+      setEmailSentSuccess('');
       const email = await fetchFollowUpEmail(dealId);
       setFollowUpEmailData(email);
       setIsFollowUpEmailOpen(true);
@@ -417,6 +432,27 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
       console.error('Failed to generate follow-up email draft:', err);
     } finally {
       setLoadingFollowUpEmail(false);
+    }
+  };
+
+  const handleSendFollowUpEmail = async () => {
+    if (!followUpEmailData) return;
+    try {
+      setSendingEmail(true);
+      const res = await sendEmail(dealId, {
+        to: recipientEmail,
+        subject: followUpEmailData.subject,
+        body: followUpEmailData.body,
+      });
+      setEmailSentSuccess(res.message);
+      setTimeout(() => {
+        setIsFollowUpEmailOpen(false);
+        setEmailSentSuccess('');
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to send email:', err);
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -1829,7 +1865,25 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
               </button>
             </div>
 
+            {emailSentSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>{emailSentSuccess}</span>
+              </div>
+            )}
+
             <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-400 mb-1">To Recipient Email:</label>
+                <input
+                  type="email"
+                  value={recipientEmail}
+                  onChange={(e) => setRecipientEmail(e.target.value)}
+                  placeholder="client@company.com"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-medium focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
               <div>
                 <label className="block font-semibold text-slate-400 mb-1">Subject Line:</label>
                 <input
@@ -1843,7 +1897,7 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
               <div>
                 <label className="block font-semibold text-slate-400 mb-1">Email Body:</label>
                 <textarea
-                  rows={10}
+                  rows={9}
                   readOnly
                   value={followUpEmailData.body}
                   className="w-full p-3.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 font-mono text-xs leading-relaxed"
@@ -1874,10 +1928,12 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
                 {emailCopied ? '✓ Copied to Clipboard!' : 'Copy Email Draft'}
               </button>
               <button
-                onClick={() => setIsFollowUpEmailOpen(false)}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-glow text-xs"
+                onClick={handleSendFollowUpEmail}
+                disabled={sendingEmail}
+                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-glow text-xs flex items-center space-x-1.5"
               >
-                Send Email & Save
+                <Send className="w-3.5 h-3.5" />
+                <span>{sendingEmail ? 'Sending Email...' : 'Send Email Now'}</span>
               </button>
             </div>
           </div>

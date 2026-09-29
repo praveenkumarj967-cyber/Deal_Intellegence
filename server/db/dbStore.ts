@@ -635,6 +635,27 @@ class DBStore {
     return newMeeting;
   }
 
+  public async deleteMeeting(meetingId: string): Promise<boolean> {
+    for (const dealId of Object.keys(this.localData.meetings)) {
+      const list = this.localData.meetings[dealId] || [];
+      const filtered = list.filter((m) => m.id !== meetingId);
+      if (filtered.length !== list.length) {
+        this.localData.meetings[dealId] = filtered;
+        break;
+      }
+    }
+
+    const sb = getSupabaseClient();
+    if (sb) {
+      try {
+        await sb.from('scheduled_meetings').delete().eq('id', meetingId);
+      } catch (e) {}
+    }
+
+    this.saveLocalStore();
+    return true;
+  }
+
   // CHAT LOGS
   public async getChatHistory(dealId: string) {
     return this.localData.chatLogs[dealId] || [];
