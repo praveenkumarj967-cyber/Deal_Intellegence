@@ -126,51 +126,79 @@ CREATE TABLE IF NOT EXISTS scheduled_meetings (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS Policies on all tables for public access
+-- Enable RLS Policies safely (with DROP IF EXISTS to avoid duplicate policy errors)
 ALTER TABLE user_credentials ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read User Credentials" ON user_credentials;
+DROP POLICY IF EXISTS "Public Insert User Credentials" ON user_credentials;
+DROP POLICY IF EXISTS "Public Update User Credentials" ON user_credentials;
 CREATE POLICY "Public Read User Credentials" ON user_credentials FOR SELECT USING (true);
 CREATE POLICY "Public Insert User Credentials" ON user_credentials FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update User Credentials" ON user_credentials FOR UPDATE USING (true);
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Profiles" ON profiles;
+DROP POLICY IF EXISTS "Public Insert Profiles" ON profiles;
+DROP POLICY IF EXISTS "Public Update Profiles" ON profiles;
 CREATE POLICY "Public Read Profiles" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Public Insert Profiles" ON profiles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Profiles" ON profiles FOR UPDATE USING (true);
 
 ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Deals" ON deals;
+DROP POLICY IF EXISTS "Public Insert Deals" ON deals;
+DROP POLICY IF EXISTS "Public Update Deals" ON deals;
 CREATE POLICY "Public Read Deals" ON deals FOR SELECT USING (true);
 CREATE POLICY "Public Insert Deals" ON deals FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Deals" ON deals FOR UPDATE USING (true);
 
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Customers" ON customers;
+DROP POLICY IF EXISTS "Public Insert Customers" ON customers;
+DROP POLICY IF EXISTS "Public Update Customers" ON customers;
 CREATE POLICY "Public Read Customers" ON customers FOR SELECT USING (true);
 CREATE POLICY "Public Insert Customers" ON customers FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Customers" ON customers FOR UPDATE USING (true);
 
 ALTER TABLE stakeholders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Stakeholders" ON stakeholders;
+DROP POLICY IF EXISTS "Public Insert Stakeholders" ON stakeholders;
+DROP POLICY IF EXISTS "Public Update Stakeholders" ON stakeholders;
 CREATE POLICY "Public Read Stakeholders" ON stakeholders FOR SELECT USING (true);
 CREATE POLICY "Public Insert Stakeholders" ON stakeholders FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Stakeholders" ON stakeholders FOR UPDATE USING (true);
 
 ALTER TABLE interactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Interactions" ON interactions;
+DROP POLICY IF EXISTS "Public Insert Interactions" ON interactions;
 CREATE POLICY "Public Read Interactions" ON interactions FOR SELECT USING (true);
 CREATE POLICY "Public Insert Interactions" ON interactions FOR INSERT WITH CHECK (true);
 
 ALTER TABLE deal_memories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Memories" ON deal_memories;
+DROP POLICY IF EXISTS "Public Insert Memories" ON deal_memories;
 CREATE POLICY "Public Read Memories" ON deal_memories FOR SELECT USING (true);
 CREATE POLICY "Public Insert Memories" ON deal_memories FOR INSERT WITH CHECK (true);
 
 ALTER TABLE competitors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Competitors" ON competitors;
+DROP POLICY IF EXISTS "Public Insert Competitors" ON competitors;
+DROP POLICY IF EXISTS "Public Update Competitors" ON competitors;
 CREATE POLICY "Public Read Competitors" ON competitors FOR SELECT USING (true);
 CREATE POLICY "Public Insert Competitors" ON competitors FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Competitors" ON competitors FOR UPDATE USING (true);
 
 ALTER TABLE recommendations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Recommendations" ON recommendations;
+DROP POLICY IF EXISTS "Public Insert Recommendations" ON recommendations;
+DROP POLICY IF EXISTS "Public Update Recommendations" ON recommendations;
 CREATE POLICY "Public Read Recommendations" ON recommendations FOR SELECT USING (true);
 CREATE POLICY "Public Insert Recommendations" ON recommendations FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Recommendations" ON recommendations FOR UPDATE USING (true);
 
 ALTER TABLE scheduled_meetings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Meetings" ON scheduled_meetings;
+DROP POLICY IF EXISTS "Public Insert Meetings" ON scheduled_meetings;
+DROP POLICY IF EXISTS "Public Delete Meetings" ON scheduled_meetings;
 CREATE POLICY "Public Read Meetings" ON scheduled_meetings FOR SELECT USING (true);
 CREATE POLICY "Public Insert Meetings" ON scheduled_meetings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Delete Meetings" ON scheduled_meetings FOR DELETE USING (true);
