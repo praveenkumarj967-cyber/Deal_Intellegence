@@ -121,7 +121,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
       if (supabaseFrontend) {
         if (isLogin) {
           const { data, error } = await supabaseFrontend.auth.signInWithPassword({ email, password });
-          if (!error && data?.user) {
+          if (error) {
+            throw new Error(`Supabase Auth Error: ${error.message}`);
+          }
+          if (data?.user) {
             const userObj = await createSecureSession(
               data.user.id,
               data.user.user_metadata?.name || email.split('@')[0],
@@ -138,7 +141,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
             password,
             options: { data: { name, role } },
           });
-          if (!error && data?.user) {
+          if (error) {
+            throw new Error(`Supabase Auth Error: ${error.message}`);
+          }
+          if (data?.user) {
             const userObj = await createSecureSession(data.user.id, name || email.split('@')[0], data.user.email || email, role);
             onAuthSuccess(userObj);
             onClose();
@@ -147,7 +153,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
         }
       }
 
-      // Secure Local Authentication Engine
+      // Offline / Local Authentication Mode
       const userObj = await createSecureSession(
         `user-${Date.now()}`,
         isLogin ? (email ? email.split('@')[0] : 'Alex Morgan') : name || 'Alex Morgan',
