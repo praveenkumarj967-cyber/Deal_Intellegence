@@ -1,0 +1,461 @@
+export interface Deal {
+  id: string;
+  name: string;
+  company: string;
+  value: number;
+  stage: string;
+  probability: number;
+  expected_close_date: string;
+  account_owner: string;
+  deal_health: string;
+  risk_level: 'Low' | 'Medium' | 'High';
+  last_interaction: string;
+  next_action: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Customer {
+  id: string;
+  deal_id: string;
+  company_name: string;
+  industry: string;
+  budget: string;
+  timeline: string;
+  current_solution: string;
+  pain_points: string[];
+  company_requirements: string[];
+  priorities: string[];
+}
+
+export interface Stakeholder {
+  id: string;
+  deal_id: string;
+  name: string;
+  title: string;
+  role: string;
+  email: string;
+  sentiment: 'Positive' | 'Neutral' | 'Negative' | 'Concerned';
+  notes: string;
+}
+
+export interface Interaction {
+  id: string;
+  deal_id: string;
+  type: 'Call' | 'Email' | 'Meeting' | 'Demo' | 'Negotiation' | 'Note';
+  title: string;
+  content: string;
+  participants: string[];
+  date: string;
+  created_at: string;
+}
+
+export interface DealMemory {
+  id: string;
+  deal_id: string;
+  interaction_id?: string;
+  memory_type: 
+    | 'Customer statement'
+    | 'Objection'
+    | 'Requirement'
+    | 'Competitor mention'
+    | 'Pricing discussion'
+    | 'Stakeholder information'
+    | 'Action item'
+    | 'Sales tactic'
+    | 'Outcome';
+  content: string;
+  importance: 'Low' | 'Medium' | 'High' | 'Critical';
+  date: string;
+  source_type: string;
+  resolved: boolean;
+  metadata?: any;
+  created_at: string;
+}
+
+export interface Competitor {
+  id: string;
+  deal_id: string;
+  name: string;
+  mentioned_date: string;
+  customer_sentiment: string;
+  consideration_reason: string;
+  address_strategy: string;
+}
+
+export interface Recommendation {
+  id: string;
+  deal_id: string;
+  recommendation: string;
+  reason: string;
+  confidence: number;
+  risk_level: 'Low' | 'Medium' | 'High';
+  risk_reason: string;
+  risk_mitigation: string;
+  status: string;
+  created_at: string;
+}
+
+export interface ScheduledMeeting {
+  id: string;
+  deal_id: string;
+  title: string;
+  date: string;
+  time: string;
+  duration: string;
+  participants: string[];
+  agenda: string;
+  meeting_link: string;
+  status: 'Scheduled' | 'Completed' | 'Cancelled';
+  created_at: string;
+}
+
+export const initialDeals: Deal[] = [
+  {
+    id: 'deal-acme-101',
+    name: 'Acme Corp Workflow Automation',
+    company: 'Acme Corporation',
+    value: 120000,
+    stage: 'Negotiation',
+    probability: 70,
+    expected_close_date: '2026-10-31',
+    account_owner: 'Alex Morgan',
+    deal_health: 'At Risk',
+    risk_level: 'Medium',
+    last_interaction: 'Sep 28, 2026 - Call regarding implementation timeline',
+    next_action: 'Provide concrete 30-day implementation roadmap and transparent onboarding cost breakdown',
+    created_at: '2026-09-01T10:00:00Z',
+    updated_at: '2026-09-28T16:30:00Z'
+  },
+  {
+    id: 'deal-technova-102',
+    name: 'TechNova Cloud Migration',
+    company: 'TechNova',
+    value: 85000,
+    stage: 'Proposal',
+    probability: 55,
+    expected_close_date: '2026-11-15',
+    account_owner: 'Alex Morgan',
+    deal_health: 'Critical',
+    risk_level: 'High',
+    last_interaction: 'Sep 24, 2026 - Competitor evaluation review',
+    next_action: 'Schedule executive alignment meeting with CTO to address HubSpot migration concerns',
+    created_at: '2026-09-05T11:00:00Z',
+    updated_at: '2026-09-24T14:20:00Z'
+  },
+  {
+    id: 'deal-globalsys-103',
+    name: 'Global Systems Enterprise License',
+    company: 'Global Systems',
+    value: 200000,
+    stage: 'Discovery',
+    probability: 35,
+    expected_close_date: '2026-12-20',
+    account_owner: 'Alex Morgan',
+    deal_health: 'Good',
+    risk_level: 'Low',
+    last_interaction: 'Sep 26, 2026 - Initial discovery workshop',
+    next_action: 'Draft custom solution architecture document for security review team',
+    created_at: '2026-09-10T09:15:00Z',
+    updated_at: '2026-09-26T11:00:00Z'
+  },
+  {
+    id: 'deal-apex-104',
+    name: 'Apex Financial Data Intelligence',
+    company: 'Apex Financial',
+    value: 150000,
+    stage: 'Demo',
+    probability: 60,
+    expected_close_date: '2026-11-30',
+    account_owner: 'Sarah Jenkins',
+    deal_health: 'Good',
+    risk_level: 'Medium',
+    last_interaction: 'Sep 27, 2026 - Technical deep-dive demo',
+    next_action: 'Send compliance documentation and sandbox trial credentials',
+    created_at: '2026-09-12T14:00:00Z',
+    updated_at: '2026-09-27T15:45:00Z'
+  },
+  {
+    id: 'deal-cybershield-105',
+    name: 'CyberShield Security Suite',
+    company: 'CyberShield Systems',
+    value: 95000,
+    stage: 'Closed Won',
+    probability: 100,
+    expected_close_date: '2026-09-20',
+    account_owner: 'Alex Morgan',
+    deal_health: 'Good',
+    risk_level: 'Low',
+    last_interaction: 'Sep 20, 2026 - Master Services Agreement Signed',
+    next_action: 'Hand off to Customer Success & Onboarding Lead',
+    created_at: '2026-08-15T08:30:00Z',
+    updated_at: '2026-09-20T17:00:00Z'
+  }
+];
+
+export const initialCustomers: Record<string, Customer> = {
+  'deal-acme-101': {
+    id: 'cust-acme',
+    deal_id: 'deal-acme-101',
+    company_name: 'Acme Corporation',
+    industry: 'Logistics & Supply Chain',
+    budget: '$100,000 - $130,000 (Annual)',
+    timeline: 'Q4 2026 Deployment (30-day onboarding required)',
+    current_solution: 'Legacy custom internal scripts & manual Excel reporting',
+    pain_points: [
+      'High operational cost due to manual data entry',
+      'Slow reporting turnarounds (3-5 business days delay)',
+      'Fragmented workflow across ops and engineering teams',
+      'Uncertainty around vendor onboarding lead times'
+    ],
+    company_requirements: [
+      'Automated real-time reporting dashboard',
+      'Must complete onboarding within 30 days',
+      'SOC2 Type II compliance and role-based access',
+      'Flexible annual billing tier'
+    ],
+    priorities: [
+      'Speed of implementation',
+      'Reduction of manual workload',
+      'Total cost of ownership vs Salesforce'
+    ]
+  },
+  'deal-technova-102': {
+    id: 'cust-technova',
+    deal_id: 'deal-technova-102',
+    company_name: 'TechNova',
+    industry: 'Software & Technology',
+    budget: '$85,000',
+    timeline: 'Q4 2026',
+    current_solution: 'HubSpot Enterprise',
+    pain_points: ['HubSpot lacks custom workflow flexibility', 'High annual license renewal price bump'],
+    company_requirements: ['Native API integrations', 'Data migration assistance'],
+    priorities: ['Ease of migration', 'Cost predictability']
+  },
+  'deal-globalsys-103': {
+    id: 'cust-globalsys',
+    deal_id: 'deal-globalsys-103',
+    company_name: 'Global Systems',
+    industry: 'Telecommunications',
+    budget: '$200,000+',
+    timeline: 'Q1 2027',
+    current_solution: 'In-house legacy platform',
+    pain_points: ['Scalability bottlenecks', 'Lack of modern AI capabilities'],
+    company_requirements: ['High availability SLA', 'Enterprise SSO & Audit logs'],
+    priorities: ['Platform security', 'Scalability']
+  }
+};
+
+export const initialStakeholders: Record<string, Stakeholder[]> = {
+  'deal-acme-101': [
+    {
+      id: 'sh-1',
+      deal_id: 'deal-acme-101',
+      name: 'Sarah Johnson',
+      title: 'VP of Operations',
+      role: 'Decision Maker',
+      email: 'sjohnson@acmecorp.com',
+      sentiment: 'Concerned',
+      notes: 'Focused on operational efficiency and strict 30-day implementation timeline. Key sign-off authority for budget.'
+    },
+    {
+      id: 'sh-2',
+      deal_id: 'deal-acme-101',
+      name: 'Mike Chen',
+      title: 'Engineering Manager',
+      role: 'Technical Contact',
+      email: 'mchen@acmecorp.com',
+      sentiment: 'Positive',
+      notes: 'Impressed by technical demo and API architecture. Championing developer experience.'
+    },
+    {
+      id: 'sh-3',
+      deal_id: 'deal-acme-101',
+      name: 'David Vance',
+      title: 'Director of Procurement',
+      role: 'Commercial Evaluator',
+      email: 'dvance@acmecorp.com',
+      sentiment: 'Neutral',
+      notes: 'Reviewing pricing structure and pushing for competitive discounts against Salesforce.'
+    }
+  ]
+};
+
+export const initialInteractions: Record<string, Interaction[]> = {
+  'deal-acme-101': [
+    {
+      id: 'int-1',
+      deal_id: 'deal-acme-101',
+      type: 'Call',
+      title: 'Initial Discovery Call',
+      content: 'Met with Sarah Johnson (VP Ops). Acme wants to streamline operational reporting and eliminate manual Excel consolidation. Primary pain points are high operational cost and slow reporting turnarounds.',
+      participants: ['Alex Morgan', 'Sarah Johnson'],
+      date: '2026-09-15',
+      created_at: '2026-09-15T14:00:00Z'
+    },
+    {
+      id: 'int-2',
+      deal_id: 'deal-acme-101',
+      type: 'Demo',
+      title: 'Technical Product Demonstration',
+      content: 'Demonstrated automated reporting and workflow pipelines to Mike Chen and Sarah Johnson. Demo completed successfully. Mike was very enthusiastic about our API flexibility and automated triggers.',
+      participants: ['Alex Morgan', 'Sarah Johnson', 'Mike Chen'],
+      date: '2026-09-18',
+      created_at: '2026-09-18T16:00:00Z'
+    },
+    {
+      id: 'int-3',
+      deal_id: 'deal-acme-101',
+      type: 'Negotiation',
+      title: 'Commercial & Pricing Discussion',
+      content: 'Customer requested annual pricing structure. Sarah objected to our initial onboarding services cost, feeling it was higher than anticipated for their scope.',
+      participants: ['Alex Morgan', 'Sarah Johnson', 'David Vance'],
+      date: '2026-09-22',
+      created_at: '2026-09-22T11:30:00Z'
+    },
+    {
+      id: 'int-4',
+      deal_id: 'deal-acme-101',
+      type: 'Meeting',
+      title: 'Technical Architecture & Competitor Review',
+      content: 'Discussed integration architecture. Customer mentioned they are actively evaluating competitor Salesforce. Sarah asked whether our implementation can be guaranteed within a 30-day window.',
+      participants: ['Alex Morgan', 'Mike Chen', 'Sarah Johnson'],
+      date: '2026-09-25',
+      created_at: '2026-09-25T15:00:00Z'
+    },
+    {
+      id: 'int-5',
+      deal_id: 'deal-acme-101',
+      type: 'Call',
+      title: 'Implementation Concern Follow-up',
+      content: 'Follow-up phone conversation with Sarah Johnson. Customer emphasized that implementation time is currently their biggest concern. They want reassurance before submitting the contract to legal.',
+      participants: ['Alex Morgan', 'Sarah Johnson'],
+      date: '2026-09-28',
+      created_at: '2026-09-28T16:30:00Z'
+    }
+  ]
+};
+
+export const initialMemories: Record<string, DealMemory[]> = {
+  'deal-acme-101': [
+    {
+      id: 'mem-1',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-1',
+      memory_type: 'Requirement',
+      content: 'Customer requires reduction of manual operational workflows and automated reporting',
+      importance: 'High',
+      date: '2026-09-15',
+      source_type: 'Call',
+      resolved: false,
+      created_at: '2026-09-15T14:05:00Z'
+    },
+    {
+      id: 'mem-2',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-2',
+      memory_type: 'Sales tactic',
+      content: 'Technical product demo displaying real-time automation increased customer interest and gained engineering endorsement',
+      importance: 'Medium',
+      date: '2026-09-18',
+      source_type: 'Demo',
+      resolved: true,
+      created_at: '2026-09-18T16:05:00Z'
+    },
+    {
+      id: 'mem-3',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-3',
+      memory_type: 'Objection',
+      content: 'Customer objected to initial onboarding cost as higher than expected',
+      importance: 'High',
+      date: '2026-09-22',
+      source_type: 'Negotiation',
+      resolved: false,
+      created_at: '2026-09-22T11:35:00Z'
+    },
+    {
+      id: 'mem-4',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-3',
+      memory_type: 'Pricing discussion',
+      content: 'Customer requested annual pricing model instead of quarterly billing',
+      importance: 'Medium',
+      date: '2026-09-22',
+      source_type: 'Negotiation',
+      resolved: true,
+      created_at: '2026-09-22T11:36:00Z'
+    },
+    {
+      id: 'mem-5',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-4',
+      memory_type: 'Competitor mention',
+      content: 'Competitor Salesforce mentioned by customer as active benchmark option',
+      importance: 'High',
+      date: '2026-09-25',
+      source_type: 'Meeting',
+      resolved: false,
+      created_at: '2026-09-25T15:05:00Z'
+    },
+    {
+      id: 'mem-6',
+      deal_id: 'deal-acme-101',
+      interaction_id: 'int-5',
+      memory_type: 'Customer statement',
+      content: 'Customer stated implementation time is their biggest remaining concern and requires guaranteed 30-day timeline',
+      importance: 'Critical',
+      date: '2026-09-28',
+      source_type: 'Call',
+      resolved: false,
+      created_at: '2026-09-28T16:35:00Z'
+    }
+  ]
+};
+
+export const initialCompetitors: Record<string, Competitor[]> = {
+  'deal-acme-101': [
+    {
+      id: 'comp-1',
+      deal_id: 'deal-acme-101',
+      name: 'Salesforce',
+      mentioned_date: '2026-09-25',
+      customer_sentiment: 'Neutral to Favorable on brand reputation',
+      consideration_reason: 'Already used in sales ops division, evaluating for operational reporting bundle',
+      address_strategy: 'Highlight our 3x faster setup speed, lower total cost of ownership, and custom developer workflow flexibility'
+    }
+  ]
+};
+
+export const initialRecommendations: Record<string, Recommendation> = {
+  'deal-acme-101': {
+    id: 'rec-acme-1',
+    deal_id: 'deal-acme-101',
+    recommendation: 'Schedule a 30-minute implementation planning call with Sarah Johnson to deliver a detailed 30-day onboarding plan and itemized cost breakdown.',
+    reason: 'The customer has repeatedly emphasized implementation speed as their primary roadblock across 3 recent interactions, while also comparing setup terms against Salesforce.',
+    confidence: 82,
+    risk_level: 'Medium',
+    risk_reason: 'Implementation concern has appeared in multiple interactions and remains unresolved, stalling final contract execution.',
+    risk_mitigation: 'Provide a written 30-day implementation guarantee with assigned technical onboarding owner prior to next call.',
+    status: 'Active',
+    created_at: '2026-09-28T17:00:00Z'
+  }
+};
+
+export const initialMeetings: Record<string, ScheduledMeeting[]> = {
+  'deal-acme-101': [
+    {
+      id: 'mtg-acme-1',
+      deal_id: 'deal-acme-101',
+      title: '30-Day Implementation Planning & Roadmap Alignment',
+      date: '2026-10-02',
+      time: '14:00',
+      duration: '30 min',
+      participants: ['Alex Morgan', 'Sarah Johnson (VP Ops)', 'Mike Chen (Eng)'],
+      agenda: 'Review 30-day onboarding milestones, assign dedicated technical lead, and walk through total cost breakdown vs Salesforce.',
+      meeting_link: 'https://meet.google.com/nexus-acme-plan',
+      status: 'Scheduled',
+      created_at: '2026-09-29T10:00:00Z'
+    }
+  ]
+};
