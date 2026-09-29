@@ -1,6 +1,14 @@
 -- Supabase SQL Schema for Deal Intelligence Agent
 -- Copy and paste this directly into Supabase SQL Editor!
 
+CREATE TABLE IF NOT EXISTS profiles (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  role TEXT DEFAULT 'Enterprise AE',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS deals (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -107,11 +115,26 @@ CREATE TABLE IF NOT EXISTS scheduled_meetings (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Turn on Row Level Security (RLS) or public access
+-- Enable RLS Policies on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Public Insert Profiles" ON profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Profiles" ON profiles FOR UPDATE USING (true);
+
 ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Deals" ON deals FOR SELECT USING (true);
 CREATE POLICY "Public Insert Deals" ON deals FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Deals" ON deals FOR UPDATE USING (true);
+
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Customers" ON customers FOR SELECT USING (true);
+CREATE POLICY "Public Insert Customers" ON customers FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Customers" ON customers FOR UPDATE USING (true);
+
+ALTER TABLE stakeholders ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Stakeholders" ON stakeholders FOR SELECT USING (true);
+CREATE POLICY "Public Insert Stakeholders" ON stakeholders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Stakeholders" ON stakeholders FOR UPDATE USING (true);
 
 ALTER TABLE interactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Interactions" ON interactions FOR SELECT USING (true);
@@ -121,6 +144,17 @@ ALTER TABLE deal_memories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Memories" ON deal_memories FOR SELECT USING (true);
 CREATE POLICY "Public Insert Memories" ON deal_memories FOR INSERT WITH CHECK (true);
 
+ALTER TABLE competitors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Competitors" ON competitors FOR SELECT USING (true);
+CREATE POLICY "Public Insert Competitors" ON competitors FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Competitors" ON competitors FOR UPDATE USING (true);
+
+ALTER TABLE recommendations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Recommendations" ON recommendations FOR SELECT USING (true);
+CREATE POLICY "Public Insert Recommendations" ON recommendations FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Recommendations" ON recommendations FOR UPDATE USING (true);
+
 ALTER TABLE scheduled_meetings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Meetings" ON scheduled_meetings FOR SELECT USING (true);
 CREATE POLICY "Public Insert Meetings" ON scheduled_meetings FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Delete Meetings" ON scheduled_meetings FOR DELETE USING (true);

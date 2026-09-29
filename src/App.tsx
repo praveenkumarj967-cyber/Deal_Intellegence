@@ -206,6 +206,35 @@ export function App() {
     { name: 'Pricing Discussions', value: 5, color: '#f59e0b' },
   ];
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center font-sans relative overflow-hidden p-4 selection:bg-blue-600 selection:text-white">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="z-10 text-center space-y-3 mb-6 max-w-md">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>Encrypted Authentication Gateway</span>
+          </div>
+          <h1 className="text-3xl font-black text-white tracking-tight">NexusAI Deal Intelligence</h1>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Authentication is required before accessing sales deals, deal memories, and AI recommendations.
+          </p>
+        </div>
+
+        <AuthModal
+          isOpen={true}
+          onClose={() => {}}
+          onAuthSuccess={(user) => {
+            setCurrentUser(user);
+            loadDashboard();
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white">
       {/* Global Navigation Header */}
