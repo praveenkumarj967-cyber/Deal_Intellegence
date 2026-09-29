@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { SalesDashboard } from './components/SalesDashboard';
 import { DealIntelligence } from './components/DealIntelligence';
+import { AuthModal, AuthUser } from './components/AuthModal';
 import { Deal, DashboardSummary } from './types';
 import { fetchDashboardDeals, createDeal, resetDemoData } from './services/api';
 import { initFrontendSupabase, supabaseFrontend } from './services/supabase';
@@ -36,6 +37,19 @@ export function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Auth State
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
+    const saved = localStorage.getItem('NEXUS_AUTH_USER');
+    return saved ? JSON.parse(saved) : {
+      id: 'usr-default',
+      name: 'Alex Morgan',
+      email: 'alex.morgan@nexus.ai',
+      role: 'Enterprise AE',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    };
+  });
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [summary, setSummary] = useState<DashboardSummary>({
     totalActive: 5,
     requiringAttention: 2,
@@ -205,6 +219,13 @@ export function App() {
         onNavigateHome={handleNavigateHome}
         onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
         isSupabaseConnected={isSupabaseConnected}
+        currentUser={currentUser}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onSignOut={() => {
+          localStorage.removeItem('NEXUS_AUTH_USER');
+          setCurrentUser(null);
+          supabaseFrontend?.auth.signOut();
+        }}
       />
 
       <div className="flex-1 flex max-w-[1600px] w-full mx-auto">
@@ -535,6 +556,13 @@ export function App() {
           )}
         </main>
       </div>
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={(user) => setCurrentUser(user)}
+      />
     </div>
   );
 }

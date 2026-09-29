@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Brain, RefreshCw, Sparkles, Database, Search, ShieldCheck, Wifi, CheckCircle2 } from 'lucide-react';
+import { Brain, RefreshCw, Sparkles, Database, Search, ShieldCheck, Wifi, CheckCircle2, LogIn, LogOut, User } from 'lucide-react';
+import { AuthUser } from './AuthModal';
 
 interface HeaderProps {
   onResetDemo: () => void;
@@ -7,12 +8,18 @@ interface HeaderProps {
   onNavigateHome: () => void;
   onOpenSupabaseModal?: () => void;
   isSupabaseConnected?: boolean;
+  currentUser: AuthUser | null;
+  onOpenAuthModal: () => void;
+  onSignOut: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onResetDemo,
   activeDealName,
   onNavigateHome,
+  currentUser,
+  onOpenAuthModal,
+  onSignOut,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between shadow-lg">
@@ -74,22 +81,40 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">Reset Demo</span>
         </button>
 
-        {/* User Account Avatar */}
-        <div className="flex items-center space-x-3 pl-2 border-l border-slate-800">
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-              alt="Alex Morgan"
-              className="w-8 h-8 rounded-full ring-2 ring-blue-500/40 object-cover"
-            />
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-950"></span>
+        {/* User Account / Auth Section */}
+        {currentUser ? (
+          <div className="flex items-center space-x-3 pl-2 border-l border-slate-800">
+            <div className="relative">
+              <img
+                src={currentUser.avatar}
+                alt={currentUser.name}
+                className="w-8 h-8 rounded-full ring-2 ring-blue-500/40 object-cover"
+              />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-950"></span>
+            </div>
+            <div className="hidden xl:block text-left">
+              <p className="text-xs font-semibold text-slate-200">{currentUser.name}</p>
+              <p className="text-[10px] text-slate-400">{currentUser.role}</p>
+            </div>
+            <button
+              onClick={onSignOut}
+              title="Sign Out"
+              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
-          <div className="hidden xl:block text-left">
-            <p className="text-xs font-semibold text-slate-200">Alex Morgan</p>
-            <p className="text-[10px] text-slate-400">Enterprise AE</p>
-          </div>
-        </div>
+        ) : (
+          <button
+            onClick={onOpenAuthModal}
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl shadow-md transition-all ml-2"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In</span>
+          </button>
+        )}
       </div>
     </header>
   );
 };
+
