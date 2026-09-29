@@ -1,6 +1,22 @@
 {
   "deals": [
     {
+      "id": "deal-1790698964031",
+      "name": "Enterprice",
+      "company": "Google",
+      "value": 100000,
+      "stage": "Discovery",
+      "probability": 35,
+      "expected_close_date": "2026-10-29",
+      "account_owner": "Alex Morgan",
+      "deal_health": "Good",
+      "risk_level": "Medium",
+      "last_interaction": "Created New Deal",
+      "next_action": "Conduct discovery call and gather requirements",
+      "created_at": "2026-09-29T16:22:44.034Z",
+      "updated_at": "2026-09-29T16:22:44.034Z"
+    },
+    {
       "id": "deal-acme-101",
       "name": "Acme Corp Workflow Automation",
       "company": "Acme Corporation",
@@ -170,6 +186,26 @@
         "Efficiency improvement",
         "Cost effectiveness"
       ]
+    },
+    "deal-1790698964031": {
+      "id": "cust-deal-1790698964031",
+      "deal_id": "deal-1790698964031",
+      "company_name": "Google",
+      "industry": "Enterprise Software",
+      "budget": "$1,00,000",
+      "timeline": "Q4 2026",
+      "current_solution": "Evaluating solution options",
+      "pain_points": [
+        "Need automated deal memory and tracking"
+      ],
+      "company_requirements": [
+        "Integration with core CRM workflow",
+        "Realtime AI briefings"
+      ],
+      "priorities": [
+        "Sales efficiency",
+        "Risk reduction"
+      ]
     }
   },
   "stakeholders": {
@@ -203,6 +239,18 @@
         "email": "dvance@acmecorp.com",
         "sentiment": "Neutral",
         "notes": "Reviewing pricing structure and pushing for competitive discounts against Salesforce."
+      }
+    ],
+    "deal-1790698964031": [
+      {
+        "id": "sh-deal-1790698964031-1",
+        "deal_id": "deal-1790698964031",
+        "name": "j praveen kumar",
+        "title": "VP of Business Operations",
+        "role": "Decision Maker",
+        "email": "praveenkumarj967@gmail.com",
+        "sentiment": "Positive",
+        "notes": "Primary client contact for Google."
       }
     ]
   },
@@ -352,6 +400,19 @@
         "resolved": false,
         "created_at": "2026-09-28T16:35:00Z"
       }
+    ],
+    "deal-1790698964031": [
+      {
+        "id": "mem-deal-1790698964031-init",
+        "deal_id": "deal-1790698964031",
+        "memory_type": "Requirement",
+        "content": "Opportunity created for Google with target pipeline value of $1,00,000.",
+        "importance": "Medium",
+        "date": "2026-09-29",
+        "source_type": "System Initialization",
+        "resolved": false,
+        "created_at": "2026-09-29T16:22:45.058Z"
+      }
     ]
   },
   "competitors": {
@@ -379,6 +440,18 @@
       "risk_mitigation": "Provide a written 30-day implementation guarantee with assigned technical onboarding owner prior to next call.",
       "status": "Active",
       "created_at": "2026-09-28T17:00:00Z"
+    },
+    "deal-1790698964031": {
+      "id": "rec-deal-1790698964031",
+      "deal_id": "deal-1790698964031",
+      "recommendation": "Conduct discovery call and gather requirements",
+      "reason": "Newly initialized deal. High priority for early engagement.",
+      "confidence": 85,
+      "risk_level": "Medium",
+      "risk_reason": "Early stage opportunity requires technical alignment.",
+      "risk_mitigation": "Schedule initial technical discovery call with key stakeholders.",
+      "status": "Active",
+      "created_at": "2026-09-29T16:22:44.070Z"
     }
   },
   "meetings": {
@@ -402,5 +475,18 @@
       }
     ]
   },
-  "chatLogs": {}
+  "chatLogs": {
+    "deal-1790698964031": [
+      {
+        "role": "user",
+        "content": "what is the current state of the project",
+        "timestamp": "2026-09-29T16:23:51.602Z"
+      },
+      {
+        "role": "assistant",
+        "content": "According to persistent deal memory for **Google**, the deal is currently in the **Discovery** stage ($1,00,000). Key stakeholders include Sarah Johnson (VP Ops) and Mike Chen (Eng). The main topic requiring resolution is providing a 30-day implementation plan to address customer objections against Salesforce.",
+        "timestamp": "2026-09-29T16:23:51.604Z"
+      }
+    ]
+  }
 }

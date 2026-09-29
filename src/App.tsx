@@ -225,6 +225,7 @@ export function App() {
           localStorage.removeItem('NEXUS_AUTH_USER');
           setCurrentUser(null);
           supabaseFrontend?.auth.signOut();
+          setIsAuthModalOpen(true);
         }}
       />
 
