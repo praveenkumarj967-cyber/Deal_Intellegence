@@ -411,11 +411,26 @@ export const DealIntelligence: React.FC<DealIntelligenceProps> = ({ dealId, onBa
     return `${mins.toString().padStart(2, '0')}:${remainder.toString().padStart(2, '0')}`;
   };
 
-  if (loading || !deal) {
+  if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-sm font-semibold text-slate-400">Syncing Deal Memory & Intelligence Core...</p>
+      </div>
+    );
+  }
+
+  if (!deal) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
+        <AlertTriangle className="w-12 h-12 text-amber-400" />
+        <p className="text-base font-bold text-white">Deal details are loading or not found.</p>
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-glow transition-all"
+        >
+          Return to Sales Dashboard
+        </button>
       </div>
     );
   }

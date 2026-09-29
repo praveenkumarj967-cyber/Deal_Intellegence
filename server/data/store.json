@@ -1,6 +1,22 @@
 {
   "deals": [
     {
+      "id": "deal-1790689251911",
+      "name": "Enterprise",
+      "company": "PhonePay",
+      "value": 100000,
+      "stage": "Discovery",
+      "probability": 35,
+      "expected_close_date": "2026-10-29",
+      "account_owner": "Alex Morgan",
+      "deal_health": "Good",
+      "risk_level": "Medium",
+      "last_interaction": "Created New Deal",
+      "next_action": "Conduct discovery call and gather requirements",
+      "created_at": "2026-09-29T13:40:51.911Z",
+      "updated_at": "2026-09-29T13:40:51.911Z"
+    },
+    {
       "id": "deal-1790689141697",
       "name": "Enterprise Automation Project",
       "company": "Stark Industries",

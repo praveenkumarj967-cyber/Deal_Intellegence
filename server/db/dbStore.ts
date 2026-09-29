@@ -168,21 +168,75 @@ class DBStore {
       updated_at: new Date().toISOString(),
     };
 
+    const defaultCustomer: Customer = {
+      id: `cust-${newDeal.id}`,
+      deal_id: newDeal.id,
+      company_name: newDeal.company,
+      industry: 'Enterprise Software',
+      budget: `$${newDeal.value.toLocaleString()}`,
+      timeline: 'Q4 2026',
+      current_solution: 'Evaluating solution options',
+      pain_points: ['Need automated deal memory and tracking'],
+      company_requirements: ['Integration with core CRM workflow', 'Realtime AI briefings'],
+      priorities: ['Sales efficiency', 'Risk reduction'],
+    };
+
+    const defaultRec: Recommendation = {
+      id: `rec-${newDeal.id}`,
+      deal_id: newDeal.id,
+      recommendation: newDeal.next_action,
+      reason: 'Newly initialized deal. High priority for early engagement.',
+      confidence: 85,
+      risk_level: newDeal.risk_level,
+      risk_reason: 'Early stage opportunity requires technical alignment.',
+      risk_mitigation: 'Schedule initial technical discovery call with key stakeholders.',
+      status: 'Active',
+      created_at: new Date().toISOString(),
+    };
+
+    const defaultStakeholder: Stakeholder = {
+      id: `sh-${newDeal.id}-1`,
+      deal_id: newDeal.id,
+      name: 'Primary Contact',
+      title: 'VP of Business Operations',
+      role: 'Decision Maker',
+      email: 'contact@prospect.com',
+      sentiment: 'Positive',
+      notes: 'Interested in AI deal memory and next action guidance.',
+    };
+
     const sb = getSupabaseClient();
     if (sb) {
       try {
-        const { data, error } = await sb.from('deals').insert([newDeal]).select();
-        if (error) {
-          console.error('⚠️ Supabase insert deal error:', error.message, error.details);
-        } else {
-          console.log('✅ Deal inserted into Supabase successfully:', newDeal.id);
-        }
+        const { error: dealErr } = await sb.from('deals').insert([newDeal]);
+        if (dealErr) console.error('⚠️ Supabase insert deal error:', dealErr.message);
+
+        await sb.from('customers').upsert([defaultCustomer]);
+        await sb.from('recommendations').upsert([defaultRec]);
+        await sb.from('stakeholders').insert([defaultStakeholder]);
       } catch (e) {
         console.warn('Supabase insert deal error:', (e as Error).message);
       }
     }
 
     this.localData.deals.unshift(newDeal);
+    this.localData.customers[newDeal.id] = defaultCustomer;
+    this.localData.recommendations[newDeal.id] = defaultRec;
+    this.localData.stakeholders[newDeal.id] = [defaultStakeholder];
+    this.localData.memories[newDeal.id] = [
+      {
+        id: `mem-${newDeal.id}-init`,
+        deal_id: newDeal.id,
+        memory_type: 'Requirement',
+        content: `Opportunity created for ${newDeal.company} with target pipeline value of $${newDeal.value.toLocaleString()}.`,
+        importance: 'Medium',
+        date: new Date().toISOString().split('T')[0],
+        source_type: 'System Initialization',
+        resolved: false,
+        created_at: new Date().toISOString(),
+      },
+    ];
+
     this.saveLocalStore();
     return newDeal;
   }
@@ -211,9 +265,10 @@ class DBStore {
 
   // CUSTOMER PROFILE
   public async getCustomerByDealId(dealId: string): Promise<Customer | null> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('customers').select('*').eq('deal_id', dealId).single();
+        const { data, error } = await sb.from('customers').select('*').eq('deal_id', dealId).single();
         if (!error && data) return data as Customer;
       } catch (e) {}
     }
@@ -259,9 +314,10 @@ class DBStore {
     }
     const updated = { ...existing, ...updates };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('customers').upsert([updated]);
+        await sb.from('customers').upsert([updated]);
       } catch (e) {}
     }
 
@@ -272,9 +328,10 @@ class DBStore {
 
   // STAKEHOLDERS
   public async getStakeholdersByDealId(dealId: string): Promise<Stakeholder[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('stakeholders').select('*').eq('deal_id', dealId);
+        const { data, error } = await sb.from('stakeholders').select('*').eq('deal_id', dealId);
         if (!error && data && data.length > 0) return data as Stakeholder[];
       } catch (e) {}
     }
@@ -294,9 +351,10 @@ class DBStore {
       notes: stakeholder.notes || '',
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('stakeholders').insert([newSh]);
+        await sb.from('stakeholders').insert([newSh]);
       } catch (e) {}
     }
 
@@ -308,9 +366,10 @@ class DBStore {
 
   // INTERACTIONS
   public async getInteractionsByDealId(dealId: string): Promise<Interaction[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('interactions')
           .select('*')
           .eq('deal_id', dealId)
@@ -336,9 +395,10 @@ class DBStore {
       created_at: new Date().toISOString(),
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('interactions').insert([newInt]);
+        await sb.from('interactions').insert([newInt]);
       } catch (e) {
         console.warn('Supabase insert interaction error:', (e as Error).message);
       }
@@ -358,9 +418,10 @@ class DBStore {
 
   // MEMORIES
   public async getMemoriesByDealId(dealId: string): Promise<DealMemory[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('deal_memories')
           .select('*')
           .eq('deal_id', dealId)
@@ -394,9 +455,10 @@ class DBStore {
       createdList.push(newMem);
     }
 
-    if (supabase && createdList.length > 0) {
+    const sb = getSupabaseClient();
+    if (sb && createdList.length > 0) {
       try {
-        await supabase.from('deal_memories').insert(createdList);
+        await sb.from('deal_memories').insert(createdList);
       } catch (e) {}
     }
 
@@ -422,9 +484,10 @@ class DBStore {
 
   // COMPETITORS
   public async getCompetitorsByDealId(dealId: string): Promise<Competitor[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('competitors').select('*').eq('deal_id', dealId);
+        const { data, error } = await sb.from('competitors').select('*').eq('deal_id', dealId);
         if (!error && data && data.length > 0) return data as Competitor[];
       } catch (e) {}
     }
@@ -456,9 +519,10 @@ class DBStore {
       list.push(comp);
     }
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('competitors').upsert([comp]);
+        await sb.from('competitors').upsert([comp]);
       } catch (e) {}
     }
 
@@ -469,9 +533,10 @@ class DBStore {
 
   // RECOMMENDATION & RISK
   public async getRecommendationByDealId(dealId: string): Promise<Recommendation | null> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase.from('recommendations').select('*').eq('deal_id', dealId).single();
+        const { data, error } = await sb.from('recommendations').select('*').eq('deal_id', dealId).single();
         if (!error && data) return data as Recommendation;
       } catch (e) {}
     }
@@ -493,9 +558,10 @@ class DBStore {
       created_at: new Date().toISOString(),
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('recommendations').upsert([newRec]);
+        await sb.from('recommendations').upsert([newRec]);
       } catch (e) {}
     }
 
@@ -513,9 +579,10 @@ class DBStore {
 
   // MEETINGS SCHEDULER
   public async getMeetingsByDealId(dealId: string): Promise<ScheduledMeeting[]> {
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('scheduled_meetings')
           .select('*')
           .eq('deal_id', dealId)
@@ -543,9 +610,10 @@ class DBStore {
       created_at: new Date().toISOString(),
     };
 
-    if (supabase) {
+    const sb = getSupabaseClient();
+    if (sb) {
       try {
-        await supabase.from('scheduled_meetings').insert([newMeeting]);
+        await sb.from('scheduled_meetings').insert([newMeeting]);
       } catch (e) {
         console.warn('Supabase insert meeting error:', (e as Error).message);
       }
