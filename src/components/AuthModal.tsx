@@ -317,35 +317,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           </button>
         </form>
 
-        {/* 1-Click Quick Auth Presets for Evaluators */}
-        <div className="pt-3 border-t border-slate-800/80 space-y-2">
-          <p className="text-[10px] uppercase tracking-wider font-extrabold text-slate-500 text-center">
-            Or Quick 1-Click Auth as Demo Role:
-          </p>
-          <div className="grid grid-cols-3 gap-2 text-[10px]">
-            <button
-              type="button"
-              onClick={() => handleQuickDemoLogin('Enterprise AE', 'alex.morgan@nexus.ai', 'Alex Morgan')}
-              className="p-2 rounded-xl bg-slate-950 hover:bg-blue-600/20 border border-slate-800 hover:border-blue-500/50 text-blue-300 text-center font-bold transition-all"
-            >
-              Alex Morgan (AE)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemoLogin('Sales Manager', 'sarah.jenkins@nexus.ai', 'Sarah Jenkins')}
-              className="p-2 rounded-xl bg-slate-950 hover:bg-purple-600/20 border border-slate-800 hover:border-purple-500/50 text-purple-300 text-center font-bold transition-all"
-            >
-              Sarah (Manager)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemoLogin('RevOps Admin', 'admin@nexus.ai', 'RevOps Admin')}
-              className="p-2 rounded-xl bg-slate-950 hover:bg-emerald-600/20 border border-slate-800 hover:border-emerald-500/50 text-emerald-300 text-center font-bold transition-all"
-            >
-              RevOps Admin
-            </button>
-          </div>
-        </div>
+
 
         <div className="text-center pt-2">
           <button

@@ -203,10 +203,4 @@ CREATE POLICY "Public Read Meetings" ON scheduled_meetings FOR SELECT USING (tru
 CREATE POLICY "Public Insert Meetings" ON scheduled_meetings FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Delete Meetings" ON scheduled_meetings FOR DELETE USING (true);
 
--- Insert Default Demo Users into user_credentials
-INSERT INTO user_credentials (id, email, password, name, role)
-VALUES 
-  ('user-demo-ae', 'alex.morgan@nexus.ai', 'password123', 'Alex Morgan', 'Enterprise AE'),
-  ('user-demo-manager', 'sarah.jenkins@nexus.ai', 'password123', 'Sarah Jenkins', 'Sales Manager'),
-  ('user-demo-admin', 'admin@nexus.ai', 'admin123', 'RevOps Admin', 'RevOps Admin')
-ON CONFLICT (email) DO NOTHING;
+-- RLS enabled tables ready for user creation and deal management
